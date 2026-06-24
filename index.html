@@ -1,0 +1,3120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprint Tracker</title>
+  <script src="https://kit.fontawesome.com/da08280601.js" crossorigin="anonymous"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      /* ── Core palette ── */
+      --header-bg: color-mix(in srgb, var(--accent), black 80%);
+      --bg: color-mix(in srgb, var(--accent), white 97%);
+      --surface: #f8fafc;
+      --white: #ffffff;
+      --border: color-mix(in srgb, var(--accent), rgb(217, 217, 217) 80%);
+      --text: #111827;
+      --text-muted: #6b7280;
+      --text-disabled: #9ca3af;
+      --accent: #4f46e5;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+
+      /* completed actions */
+      --color-review: var(--dot-green);
+
+      /* ── Shadows & overlays ── */
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+      --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+      --shadow-header: 0 2px 8px rgba(0, 0, 0, 0.25);
+      --overlay-bg: rgba(0, 0, 0, 0.3);
+
+      /* ── Connectivity dots ── */
+      --dot-green: #4ade80;
+      --dot-red: #f87171;
+      --dot-grey: #94a3b8;
+
+      /**/
+      --col-min: 60px;
+    }
+
+    /* ── Base ── */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--header-bg);
+      color: var(--white);
+      padding: 0 20px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      box-shadow: var(--shadow-header);
+    }
+
+    header h1 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .view-toggle {
+      display: flex;
+      background: color-mix(in srgb, var(--white), transparent 90%);
+      border: 1px solid color-mix(in srgb, var(--white), transparent 82%);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .view-toggle button {
+      background: none;
+      border: none;
+      color: color-mix(in srgb, var(--white), transparent 40%);
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.12s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .view-toggle button.active {
+      background: color-mix(in srgb, var(--white), transparent 82%);
+      color: var(--white);
+    }
+
+    .view-toggle button:hover:not(.active) {
+      background: color-mix(in srgb, var(--white), transparent 92%);
+      color: var(--white);
+    }
+    
+
+    /* ── Buttons ── */
+    .btn {
+      padding: 5px 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.12s, opacity 0.12s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: color-mix(in srgb, var(--accent), black 10%);
+    }
+
+    .btn-sm {
+      padding: 3px 9px;
+      font-size: 11px;
+    }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .btn-ghost {
+      background: color-mix(in srgb, var(--white), transparent 92%);
+      color: var(--white);
+      border: 1px solid color-mix(in srgb, var(--white), transparent 82%);
+    }
+
+    .btn-ghost:hover {
+      background: color-mix(in srgb, var(--white), transparent 85%);
+    }
+
+    .btn-add-sprint {
+      background: color-mix(in srgb, var(--accent), transparent 95%);
+      color: var(--text);
+      border: 1px solid var(--accent);
+      width: 100%;
+      text-align: center;
+      justify-content: center;
+      padding: 8px;
+    }
+
+    .btn-add-sprint:hover {
+      background: color-mix(in srgb, var(--accent), transparent 90%);
+    }
+
+    .btn-icon {
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .btn-icon:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .btn-icon.danger:hover {
+      background: color-mix(in srgb, var(--danger), transparent 90%);
+      color: var(--danger);
+    }
+
+    /* ── Initiative rail ── */
+    #init-rail {
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+      padding: 16px 0px;
+    }
+    .init-rail-btn {
+      display: inline-flex; align-items: center;
+      font-size: 12px; font-weight: 600;
+      padding: 3px 10px; border-radius: 99px;
+      border: 1px solid; cursor: pointer;
+      font-family: inherit; transition: filter 0.1s;
+      white-space: nowrap;
+    }
+    .init-rail-btn:hover { filter: brightness(0.92); }
+
+    #app, #init-rail, #calendar-view, #gantt-view{
+      max-width: 1600px;
+      margin: auto;
+    }
+    #gantt-view, #calendar-view{
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    /* ── Main & Table ── */
+    main {
+      padding: 18px 20px 60px;
+    }
+
+    .table-wrapper {
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      background: var(--white);
+      overflow-x: auto;
+      overflow-y: visible;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background: color-mix(in srgb, var(--border), white 90%);
+      padding: 0 10px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      height: 36px;
+      position: sticky;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr {
+      transition: background 0.08s;
+    }
+
+    tbody tr:hover {
+      background: var(--surface);
+    }
+
+    tbody tr:hover .row-actions,
+    tbody tr:hover .order-btns {
+      opacity: 1;
+    }
+
+    td {
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* ── Date display ── */
+    .date-calc {
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    /* ── Resources ── */
+    .resources-cell {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 3px;
+      padding: 6px 0;
+    }
+
+    .resource-chip {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      min-width: 0;
+      padding: 2px 8px;
+      border: 1px solid var(--accent);
+      border-radius: 99px;
+      background: color-mix(in srgb, var(--accent), transparent 90%);
+    }
+
+    .resource-chip-name {
+      font-size: 11px;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .resource-chip-name:hover {
+      text-decoration: underline;
+    }
+
+    .resource-add-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 2px 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      transition: color 0.1s;
+    }
+
+    .resource-add-btn:hover {
+      color: var(--accent);
+    }
+
+    /* ── Step buttons (phase date toggles) ── */
+    .step-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 6px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: all 0.12s;
+      width: 100%;
+      border: 1px solid var(--border);
+      background: transparent;
+    }
+
+    .step-btn .step-date {
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .step-btn:hover {
+      border-color: color-mix(in srgb, var(--color-review), transparent 40%);
+      background: color-mix(in srgb, var(--color-review), transparent 80%);
+    }
+
+    .step-btn.done,
+    .step-btn.release-done {
+      background: color-mix(in srgb, var(--color-review), transparent 85%);
+      border-color: var(--color-review)
+    }
+
+    .step-btn.done:hover,
+    .step-btn.release-done:hover {
+      background: color-mix(in srgb, var(--color-review), transparent 60%);
+      border-color: color-mix(in srgb, var(--color-review), transparent 30%);
+    }
+
+    /* ── Released row ── */
+    tr.released-row td {
+      background: color-mix(in srgb, var(--surface), transparent 50%);
+    }
+
+    tr.released-row .date-calc {
+      color: var(--text-disabled);
+    }
+
+    tr.released-row .resources-cell {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    tr.released-row .order-btns {
+      display: none;
+    }
+
+    /* ── Year divider ── */
+    tr.year-divider-row td {
+      padding: 0;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      height: 12px;
+    }
+
+    .year-divider-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Row actions / order buttons ── */
+    .row-actions {
+      opacity: 0;
+      display: flex;
+      gap: 2px;
+      align-items: center;
+      transition: opacity 0.1s;
+    }
+
+    .order-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      opacity: 0;
+      transition: opacity 0.1s;
+    }
+
+    .order-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 10px;
+      line-height: 1;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+
+    .order-btn:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ── Sprint name cell ── */
+    .sprint-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .sprint-label-chip {
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 5px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      cursor: pointer;
+      background: none;
+      font-family: inherit;
+      transition: filter 0.1s;
+      width: fit-content;
+    }
+
+    .sprint-label-chip:hover {
+      filter: brightness(0.92);
+    }
+
+    /* ── Flyout breadcrumbs ── */
+    .flyout-breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      font-size: 12px;
+    }
+
+    .flyout-bc-link {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      font-size: 12px;
+      color: var(--accent);
+      font-family: inherit;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .flyout-bc-link:hover {
+      color: var(--accent-hover);
+    }
+
+    .flyout-bc-sep {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .flyout-bc-current {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    /* ── Flyout detail values ── */
+    .flyout-detail-val {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ── Flyout target dates ── */
+    .flyout-dates-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .flyout-date-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .flyout-date-label {
+      color: var(--text-muted);
+      min-width: 100px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .flyout-date-val {
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      min-width: 52px;
+    }
+
+    .flyout-step-tag {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 99px;
+      letter-spacing: 0.03em;
+    }
+
+    .flyout-step-tag.done {
+      background: color-mix(in srgb, var(--color-review), white 75%);
+      color: var(--text);
+    }
+
+    .flyout-step-tag.upcoming {
+      background: color-mix(in srgb, var(--accent), white 82%);
+      color: var(--text);
+    }
+
+    .sprint-desc-preview {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ── Initiative badge ── */
+    .init-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 99px;
+      min-width: 80px;
+      justify-content: center;
+    }
+
+    /* ── Overlay & Panels ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--overlay-bg);
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 340px;
+      height: 100vh;
+      background: var(--white);
+      z-index: 400;
+      box-shadow: -4px 0 24px color-mix(in srgb, var(--text), transparent 85%);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.22s ease;
+    }
+
+    .panel.open {
+      transform: translateX(0);
+    }
+
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+
+    .panel-header h2 {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .panel-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .panel-close:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .panel-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+
+    /* ── Settings form elements ── */
+    .setting-group h3 {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .setting-row {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .resources-settings .setting-row {
+      flex-direction: row;
+    }
+
+    .setting-row input {
+      flex: 1;
+    }
+
+    .setting-row label {
+      font-size: 12px;
+      color: var(--text);
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .setting-row .hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: block;
+      margin-top: 2px;
+    }
+
+    textarea.setting-input {
+      min-height: 72px;
+      width: 100%;
+    }
+
+    .setting-input,
+    .setting-select {
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      flex-shrink: 0;
+      background: var(--white);
+      color: var(--text);
+      font-family: inherit;
+    }
+
+    .setting-select {
+      width: 110px;
+    }
+
+    .setting-input:focus,
+    .setting-select:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent), transparent 75%);
+      border-color: var(--accent);
+    }
+
+    .dows-row {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .dow-computed {
+      font-size: 11px;
+      background: var(--bg);
+      border-radius: 3px;
+      padding: 2px 7px;
+      color: var(--text-muted);
+    }
+
+    .dow-computed span {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* ── Popover ── */
+    .popover {
+      position: fixed;
+      z-index: 1000;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      padding: 12px;
+      min-width: 260px;
+      display: none;
+    }
+
+    .popover.open {
+      display: block;
+    }
+
+    .popover h4 {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .popover-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .popover input {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+    }
+
+    .popover input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent), transparent 75%);
+      border-color: var(--accent);
+    }
+
+    .popover-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      justify-content: flex-end;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--white);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    /* ── Loading / spinner ── */
+    #loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      color: var(--text-muted);
+      font-size: 13px;
+      gap: 10px;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ── Connectivity dot ── */
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot.green {
+      background: var(--dot-green);
+    }
+
+    .dot.red {
+      background: var(--dot-red);
+    }
+
+    .dot.grey {
+      background: var(--dot-grey);
+    }
+
+    /* ── Flyout content ── */
+
+    .flyout-stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding: 12px 14px;
+      background: var(--surface);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .flyout-stat {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .flyout-stat strong {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      display: block;
+    }
+
+    .flyout-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .flyout-epic-item {
+      padding: 10px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      margin-bottom: 6px;
+      transition: background 0.1s, border-color 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .flyout-epic-item:hover {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+
+    .flyout-epic-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .flyout-epic-counts {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .flyout-sprint-item {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .flyout-sprint-item:last-child {
+      border-bottom: none;
+    }
+
+    .flyout-sprint-item.is-released {
+      opacity: 0.65;
+    }
+
+    .flyout-sprint-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .flyout-sprint-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .flyout-sprint-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 99px;
+      letter-spacing: 0.03em;
+    }
+
+    .flyout-sprint-badge.released {
+      background: color-mix(in srgb, var(--color-review), transparent 75%);
+      color: var(--color-review);
+    }
+
+    .flyout-sprint-badge.planned {
+      background: color-mix(in srgb, var(--accent), transparent 80%);
+      color: var(--accent);
+    }
+
+    .flyout-sprint-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      line-height: 1.45;
+    }
+
+    .flyout-sprint-dates {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .flyout-empty {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 8px 0;
+    }
+
+    /* ── Calendar view ── */
+    #calendar-view {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .cal-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cal-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cal-nav button {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.1s;
+    }
+
+    .cal-nav button:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .cal-month-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      min-width: 150px;
+      text-align: center;
+    }
+
+    .cal-filters {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .cal-filter-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-right: 4px;
+    }
+
+    .cal-filter-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+
+    /* Filter pills — each step type uses its own color var */
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 2px solid var(--border);
+      transition: all 0.12s;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: color-mix(in srgb, var(--accent), transparent 90%);
+    }
+
+    .filter-pill.off {
+      opacity: 0.35;
+    }
+
+    /* Calendar dropdowns */
+    .cal-dropdown-wrap {
+      position: relative;
+    }
+
+    .cal-dropdown-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.12s;
+    }
+
+    .cal-dropdown-btn:hover {
+      background: var(--bg);
+    }
+
+    .cal-dropdown-btn.has-filter {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .cal-dropdown-btn i.chevron {
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+
+    .cal-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 300;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      min-width: 180px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding: 6px 0;
+      display: none;
+    }
+
+    .cal-dropdown-menu.open {
+      display: block;
+    }
+
+    .cal-dropdown-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 12px 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .cal-dropdown-header button {
+      background: none;
+      border: none;
+      font-size: 10px;
+      cursor: pointer;
+      color: var(--accent);
+      font-weight: 600;
+      padding: 0;
+    }
+
+    .cal-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text);
+      transition: background 0.1s;
+    }
+
+    .cal-dropdown-item:hover {
+      background: var(--bg);
+    }
+
+    .cal-dropdown-item input[type=checkbox] {
+      cursor: pointer;
+      accent-color: var(--accent);
+      width: 13px;
+      height: 13px;
+    }
+
+    /* Calendar grid */
+    .cal-grid-wrap {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      background: var(--white);
+    }
+
+    .cal-month-block {
+      background: var(--white);
+      border-radius: 8px;
+      overflow: hidden;
+      border: solid 1px var(--border);
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .cal-month-heading {
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      overflow: hidden;
+      background-color: var(--surface);
+    }
+    .cal-grid div:nth-child(5n){
+      border-right: none;
+    }
+
+    .cal-dow-header {
+      background: var(--bg);
+      padding: 6px 0;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cal-cell {
+      min-height: 60px;
+      padding: 6px 8px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      background: var(--white);
+    }
+
+    .cal-cell.other-month {
+      background: var(--surface);
+    }
+
+    .cal-cell.today {
+      border: solid 1px var(--accent);
+    }
+
+    .cal-day-num {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cal-cell.today .cal-day-num .day-n {
+      background: var(--accent);
+      color: var(--white);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .cal-chips {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 2px;
+    }
+
+    .cal-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      border: 1px solid transparent;
+      cursor: default;
+    }
+
+    .cal-chip .chip-icon {
+      font-size: 9px;
+      flex-shrink: 0;
+    }
+
+    /* ── Accent picker ── */
+    .accent-picker-wrap {
+      display: flex; align-items: center; gap: 5px;
+      color: color-mix(in srgb, var(--white), transparent 40%);
+      font-size: 13px; cursor: pointer;
+      padding: 4px 6px; border-radius: 5px;
+      transition: background 0.15s;
+    }
+    .accent-picker-wrap:hover { background: color-mix(in srgb, var(--white), transparent 88%); }
+    .accent-picker-wrap input[type=color] {
+      width: 18px; height: 18px; border: none; background: none;
+      padding: 0; cursor: pointer; border-radius: 3px; overflow: hidden;
+    }
+    .accent-picker-wrap input[type=color]::-webkit-color-swatch-wrapper { padding: 0; }
+    .accent-picker-wrap input[type=color]::-webkit-color-swatch { border: none; border-radius: 3px; }
+
+    /* ── Gantt ── */
+    #gantt-view { background: var(--white); }
+    .gantt-toolbar {
+      display: flex; align-items: center; padding: 10px 16px;
+      background: var(--white); border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .gantt-label-init {
+      display: flex; align-items: center; padding: 0 10px;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      font-size: 12px; font-weight: 600;
+    }
+    .gantt-label-epic {
+      display: flex; align-items: center; padding: 0 18px;
+      background: var(--white); border-bottom: 1px solid var(--border);
+      font-size: 11px; color: var(--text-muted); font-weight: 500;
+    }
+    .gantt-label-sprint {
+      display: flex; align-items: center; padding: 0 24px;
+      border-bottom: 1px solid var(--border); background: var(--white);
+    }
+    .gantt-bar-init { background: var(--surface); border-bottom: 1px solid var(--border); }
+    .gantt-bar-epic { background: color-mix(in srgb, var(--surface), transparent 50%); border-bottom: 1px solid var(--border); }
+    .gantt-bar-row { border-bottom: 1px solid var(--border); box-sizing: border-box; }
+    .gantt-week-tick {
+      position: absolute; top: 6px;
+      font-size: 10px; color: var(--text-muted); font-weight: 500;
+      transform: translateX(-50%); white-space: nowrap; pointer-events: none;
+    }
+    .gantt-week-line {
+      position: absolute; top: 0; bottom: 0; width: 1px;
+      background: var(--border); pointer-events: none;
+    }
+    .gantt-today-line {
+      position: absolute; top: 0; bottom: 0; width: 2px;
+      background: var(--accent); opacity: 0.5; pointer-events: none; z-index: 2;
+    }
+    .gantt-bar-inner {
+      position: absolute; top: 6px; bottom: 6px;
+      border-radius: 4px; border: 1px solid transparent;
+      cursor: pointer; overflow: hidden;
+      display: flex; align-items: center;
+      transition: filter 0.1s;
+    }
+    .gantt-bar-inner:hover { filter: brightness(0.9); }
+    .gantt-bar-label {
+      font-size: 10px; font-weight: 600; padding: 0 6px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      position: relative; z-index: 2; color: var(--text);
+    }
+    .gantt-marker {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 8px; height: 8px; border-radius: 50%;
+      background: color-mix(in srgb, var(--text-muted), transparent 30%);
+      border: 1.5px solid var(--white);
+      margin-left: -4px; z-index: 3;
+    }
+    .gantt-marker.done { background: #4ade80; }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Sprint Tracker</h1>
+    <div class="view-toggle">
+      <button id="view-table-btn" class="active" onclick="setView('table')"><i class="fa-solid fa-table-list"></i>
+        Table</button>
+      <button id="view-cal-btn" onclick="setView('calendar')"><i class="fa-solid fa-calendar-days"></i>
+        Calendar</button>
+      <button id="view-gantt-btn" onclick="setView('gantt')"><i class="fa-solid fa-chart-gantt"></i>
+        Gantt</button>
+    </div>
+    <div class="header-right">
+      <span id="conn-dot" class="dot grey" title="Connecting..."></span>
+      <label class="accent-picker-wrap" title="Accent color">
+        <i class="fa-solid fa-palette"></i>
+        <input type="color" id="accent-picker" oninput="setAccent(this.value)">
+      </label>
+      <button class="btn btn-ghost" onclick="openSettings()"><i class="fa-solid fa-gear"></i> Settings</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="loading">
+      <div class="spinner"></div> Connecting to Firestore…
+    </div>
+    <div id="init-rail" style="display:none"></div>
+    <div id="app" style="display:none">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th style="width:70%">Sprint</th>
+              <th style="width: 30%;">Resources</th>
+              <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-review">Review</th>
+              <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-handoff">Handoff</th>
+              <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-kickoff">Dev Kickoff</th>
+              <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-test">Test</th>
+              <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-release">Release</th>
+              <th style="min-width:var(--col-min)"></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px">
+        <button class="btn btn-add-sprint" onclick="addSprint()"><i class="fa-solid fa-plus"></i> Add
+          Sprint</button>
+      </div>
+    </div>
+    <!-- Calendar View -->
+    <div id="calendar-view">
+      <div class="cal-toolbar">
+        <div class="cal-nav">
+          <button onclick="calPrev()"><i class="fa-solid fa-chevron-left"></i></button>
+          <span class="cal-month-label" id="cal-month-label"></span>
+          <button onclick="calNext()"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="cal-filters">
+          <span class="cal-filter-label">Filter by:</span>
+          <button class="filter-pill review" id="fp-review" onclick="toggleFilter('review')"><i
+              class="fa-solid fa-magnifying-glass chip-icon"></i> Review</button>
+          <button class="filter-pill handoff" id="fp-handoff" onclick="toggleFilter('handoff')"><i
+              class="fa-solid fa-layer-group chip-icon"></i> Handoff</button>
+          <button class="filter-pill kickoff" id="fp-kickoff" onclick="toggleFilter('kickoff')"><i
+              class="fa-solid fa-code chip-icon"></i> Dev Kickoff</button>
+          <button class="filter-pill test" id="fp-test" onclick="toggleFilter('test')"><i
+              class="fa-solid fa-flask chip-icon"></i> Test</button>
+          <button class="filter-pill release" id="fp-release" onclick="toggleFilter('release')"><i
+              class="fa-solid fa-rocket chip-icon"></i> Release</button>
+        </div>
+      </div>
+      <div class="cal-grid-wrap" id="cal-grid-wrap"></div>
+    </div>
+    <!-- Gantt View -->
+    <div id="gantt-view" style="display:none; flex-direction:column; min-height:calc(100vh - 300px)">
+      <div class="gantt-toolbar">
+        <div class="cal-nav">
+          <button onclick="ganttPrev()"><i class="fa-solid fa-chevron-left"></i></button>
+          <span class="cal-month-label" id="gantt-quarter-label"></span>
+          <button onclick="ganttNext()"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+      <div id="gantt-scroll-outer" style="flex:1;overflow:auto"></div>
+    </div>
+  </main>
+  <datalist id="initiative-list"></datalist>
+  <datalist id="epic-list"></datalist>
+
+  <!-- Settings Panel -->
+  <div id="overlay" class="overlay" onclick="closeSettings()"></div>
+  <div id="panel" class="panel">
+    <div class="panel-header">
+      <h2>Settings</h2>
+      <button class="panel-close" onclick="closeSettings()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="panel-body">
+      <div class="setting-group">
+        <h3>Sprint Schedule Rules</h3>
+        <div class="setting-row">
+          <label>Dev Kickoff day<span class="hint">Day of week sprints start</span></label>
+          <select class="setting-select" id="s-kickoff-dow">
+            <option value="0">Sunday</option>
+            <option value="1">Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label>Review<span class="hint">Days <em>before</em> Dev Kickoff</span></label>
+          <input type="number" min="0" max="60" class="setting-input" id="s-review-offset">
+        </div>
+        <div class="setting-row">
+          <label>Handoff<span class="hint">Days <em>before</em> Dev Kickoff</span></label>
+          <input type="number" min="0" max="60" class="setting-input" id="s-handoff-offset">
+        </div>
+        <div class="setting-row">
+          <label>Release<span class="hint">Days <em>after</em> Test</span></label>
+          <input type="number" min="0" max="14" class="setting-input" id="s-release-offset">
+        </div>
+        <div class="setting-row">
+          <label>Lead time<span class="hint">Days gap between Release and next Kickoff (beyond natural
+              cadence)</span></label>
+          <input type="number" min="0" max="60" class="setting-input" id="s-lead-time">
+        </div>
+      </div>
+      <div class="setting-group">
+        <h3>Resulting Day-of-Week</h3>
+        <div id="dow-preview" class="dows-row"></div>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn btn-secondary" onclick="closeSettings()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+
+  <!-- Flyout Panel -->
+  <div id="flyout-overlay" class="overlay" onclick="closeFlyout()"></div>
+  <div id="flyout-panel" class="panel">
+    <div class="panel-header">
+      <h2 id="flyout-title"></h2>
+      <button class="panel-close" onclick="closeFlyout()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="panel-body" id="flyout-body"></div>
+  </div>
+
+  <!-- Link Popover -->
+  <div id="link-popover" class="popover">
+    <h4 id="popover-title">Add Resource</h4>
+    <div class="popover-row" style="margin-bottom:6px">
+      <input type="text" id="popover-name" placeholder="Name (e.g. User Stories)"
+        onkeydown="if(event.key==='Enter')document.getElementById('popover-url').focus()">
+    </div>
+    <div class="popover-row">
+      <input type="url" id="popover-url" placeholder="https://…" onkeydown="if(event.key==='Enter')savePopover()">
+    </div>
+    <div class="popover-actions">
+      <button class="btn btn-sm btn-secondary" onclick="closePopover()">Cancel</button>
+      <button class="btn btn-sm btn-primary" onclick="savePopover()">Save</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+    import {
+      getFirestore, collection, doc, onSnapshot, setDoc, addDoc,
+      deleteDoc, updateDoc, query, orderBy, writeBatch, getDocs, getDoc
+    } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+    // ── Accent color ──────────────────────────────────────────────────────────────
+    const ACCENT_KEY = 'sprint-tracker-accent';
+    window.setAccent = (hex) => {
+      document.documentElement.style.setProperty('--accent', hex);
+      localStorage.setItem(ACCENT_KEY, hex);
+    };
+    (() => {
+      const saved = localStorage.getItem(ACCENT_KEY);
+      if (saved) {
+        document.documentElement.style.setProperty('--accent', saved);
+        const picker = document.getElementById('accent-picker');
+        if (picker) picker.value = saved;
+      } else {
+        // Sync picker to default CSS value
+        const picker = document.getElementById('accent-picker');
+        if (picker) picker.value = '#4f46e5';
+      }
+    })();
+
+    // ── Firebase ──────────────────────────────────────────────────────────────────
+    const app = initializeApp({
+      apiKey: "AIzaSyDMxjzNyCyYsYDlhI3VR8Ef7erV2f7XjfE",
+      authDomain: "platinum-sprint-tracker.firebaseapp.com",
+      projectId: "platinum-sprint-tracker",
+      storageBucket: "platinum-sprint-tracker.firebasestorage.app",
+      messagingSenderId: "434272068384",
+      appId: "1:434272068384:web:e92b2910fcab3f33e02d45"
+    });
+    const db = getFirestore(app);
+
+    // ── State ─────────────────────────────────────────────────────────────────────
+    let settings = { kickoff_dow: 3, review_offset: 15, handoff_offset: 1, release_offset: 1, lead_time: 0 };
+    let initiatives = [];   // [{ id, name, order, color_index }]
+    let epics = [];         // [{ id, initiative_id, name, order }]
+    let sprints = [];       // [{ id, epic_id, initiative_id, sprint_number, description, resources, length_weeks, manual_kickoff, global_order }]
+    let loaded = { settings: false, initiatives: false, epics: false, sprints: false };
+
+    // Popover state
+    let popoverCtx = null;  // { sprintId, resource }
+
+    // ── Colour Palette ────────────────────────────────────────────────────────────
+    // Initiative badge colors (bg/border/text for the init badge chip)
+    const PALETTE = [
+      { bg: '#eff6ff', border: '#3b82f6', text: '#1e40af' },
+      { bg: '#f0fdf4', border: '#22c55e', text: '#166534' },
+      { bg: '#fdf4ff', border: '#d946ef', text: '#86198f' },
+      { bg: '#fff7ed', border: '#f97316', text: '#9a3412' },
+      { bg: '#f0f9ff', border: '#0ea5e9', text: '#075985' },
+      { bg: '#fefce8', border: '#eab308', text: '#854d0e' },
+    ];
+
+    // Initiative base hues (HSL degrees). Each initiative owns a color family;
+    // epics step +30° from the base so they stay related but are visually distinct.
+    const INIT_HUES = [220, 142, 292, 25, 198, 48]; // blue, green, purple, orange, cyan, yellow
+    const EPIC_HUE_STEP = 30;
+
+    // Returns inline style string for a calendar chip, computed entirely in JS.
+    function epicChipStyle(epic, initColorIndex) {
+      const base = INIT_HUES[initColorIndex % INIT_HUES.length];
+      const hue = (base + (epic.color_index ?? 0) * EPIC_HUE_STEP) % 360;
+      return `background:hsl(${hue} 75% 65% / 0.13);border-color:hsl(${hue} 60% 50% / 0.45);color:var(--text)`;
+    }
+    const DOW_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    // ── Date Utilities ────────────────────────────────────────────────────────────
+    function abbreviate(str) {
+      if (!str || !str.trim()) return '??';
+      const words = str.trim().split(/\s+/);
+      if (words.length === 1) return words[0].substring(0, 2).toUpperCase();
+      return words.map(w => w[0]).join('').toUpperCase();
+    }
+    // Returns a Map<sprintId, number> with auto-computed sprint numbers.
+    // Each epic starts at 1; every sprint increments by length_weeks * 0.125
+    // (2wk=+0.25, 4wk=+0.5, 6wk=+0.75, 8wk=+1.0). Minimum sprint length is 2 weeks.
+    function computeSprintNumbers() {
+      const byEpic = {};
+      sprints.forEach(s => {
+        const key = s.epic_id || '__none__';
+        if (!byEpic[key]) byEpic[key] = [];
+        byEpic[key].push(s);
+      });
+      const map = new Map();
+      Object.values(byEpic).forEach(group => {
+        group.sort((a, b) => a.global_order - b.global_order);
+        let num = 1;
+        group.forEach(s => {
+          const len = Math.max(2, s.length_weeks || 2);
+          num = Math.round((num + len * 0.125) * 1000) / 1000; // avoid float drift
+          map.set(s.id, num);
+        });
+      });
+      return map;
+    }
+
+    function sprintLabel(sprint, numMap) {
+      const init = initiatives.find(i => i.id === sprint.initiative_id);
+      const epic = epics.find(e => e.id === sprint.epic_id);
+      const i = abbreviate(init?.name);
+      const e = abbreviate(epic?.name);
+      const n = (numMap || computeSprintNumbers()).get(sprint.id) ?? '?';
+      return `${i}-${e}-${n}`;
+    }
+
+    function parseDate(str) {
+      return new Date(str + 'T00:00:00');
+    }
+    function toISO(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+    function fmtDate(str) {
+      if (!str) return '—';
+      const d = parseDate(str);
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${m}/${day}`;
+    }
+    function dateYear(str) {
+      return str ? parseDate(str).getFullYear() : null;
+    }
+    function addDays(str, n) {
+      const d = parseDate(str);
+      d.setDate(d.getDate() + n);
+      return toISO(d);
+    }
+    function nextDOW(str, dow, strict = true) {
+      // Next occurrence of day-of-week after (strict) or on/after (!strict) str
+      const d = parseDate(str);
+      if (strict) d.setDate(d.getDate() + 1);
+      const diff = ((dow - d.getDay()) + 7) % 7;
+      d.setDate(d.getDate() + diff);
+      return toISO(d);
+    }
+    function dowOf(str) {
+      if (!str) return '';
+      return DOW_NAMES[parseDate(str).getDay()];
+    }
+    function kickoffPickerBase(dow) {
+      // 2020-01-01 is a Wednesday (getDay() === 3). Offset from there to find the
+      // nearest occurrence of `dow`, then use as min + step=7 to restrict the picker.
+      const ref = parseDate('2020-01-01'); // Wednesday
+      const diff = ((dow - 3) + 7) % 7;
+      ref.setDate(ref.getDate() + diff);
+      return toISO(ref);
+    }
+
+    // ── Date Computation ──────────────────────────────────────────────────────────
+    function calcDates(kickoff, lengthWks, s) {
+      const test = addDays(kickoff, Math.round(lengthWks * 7));
+      return {
+        review: addDays(kickoff, -s.review_offset),
+        handoff: addDays(kickoff, -s.handoff_offset),
+        kickoff,
+        test,
+        release: addDays(test, s.release_offset)
+      };
+    }
+
+    function computeAllSprints() {
+      const sorted = [...sprints].sort((a, b) => a.global_order - b.global_order);
+      let prevRelease = null;
+      return sorted.map(s => {
+        let kickoff = s.manual_kickoff || null;
+        if (!kickoff && prevRelease) {
+          const afterLead = (settings.lead_time > 0) ? addDays(prevRelease, settings.lead_time) : prevRelease;
+          kickoff = nextDOW(afterLead, settings.kickoff_dow, true);
+        }
+        if (!kickoff) kickoff = toISO(new Date());
+        // Released sprints use frozen dates — immune to length/upstream changes
+        const dates = (s.released && s.frozen_test)
+          ? { review: addDays(kickoff, -settings.review_offset), handoff: addDays(kickoff, -settings.handoff_offset), kickoff, test: s.frozen_test, release: s.frozen_release }
+          : calcDates(kickoff, s.length_weeks || 2, settings);
+        prevRelease = dates.release;
+        return { ...s, ...dates };
+      });
+    }
+
+    // ── Firestore Helpers ─────────────────────────────────────────────────────────
+    async function saveSettings() {
+      const s = readSettingsForm();
+      await setDoc(doc(db, 'settings', 'config'), s);
+      closeSettings();
+      toast('Settings saved');
+    }
+    window.saveSettings = saveSettings;
+
+    async function addInitiative() {
+      const maxOrder = Math.max(0, ...initiatives.map(i => i.order));
+      const color_index = initiatives.length % PALETTE.length;
+      await addDoc(collection(db, 'initiatives'), {
+        name: 'New Initiative', order: maxOrder + 1, color_index
+      });
+      toast('Initiative added');
+    }
+    window.addInitiative = addInitiative;
+
+    async function deleteInitiative(id) {
+      if (!confirm('Delete this initiative and all its epics and sprints?')) return;
+      const batch = writeBatch(db);
+      const epicIds = epics.filter(e => e.initiative_id === id).map(e => e.id);
+      sprints.filter(s => epicIds.includes(s.epic_id) || s.initiative_id === id).forEach(s => {
+        batch.delete(doc(db, 'sprints', s.id));
+      });
+      epicIds.forEach(eid => batch.delete(doc(db, 'epics', eid)));
+      batch.delete(doc(db, 'initiatives', id));
+      await batch.commit();
+    }
+    window.deleteInitiative = deleteInitiative;
+
+    async function addEpic(initiativeId) {
+      const epicList = epics.filter(e => e.initiative_id === initiativeId);
+      const maxOrder = Math.max(0, ...epicList.map(e => e.order));
+      const color_index = epicList.length; // fixed at creation, never redistributed
+      await addDoc(collection(db, 'epics'), {
+        initiative_id: initiativeId, name: 'New Epic', order: maxOrder + 1, color_index
+      });
+    }
+    window.addEpic = addEpic;
+
+    async function deleteEpic(id) {
+      if (!confirm('Delete this epic and all its sprints?')) return;
+      const batch = writeBatch(db);
+      sprints.filter(s => s.epic_id === id).forEach(s => batch.delete(doc(db, 'sprints', s.id)));
+      batch.delete(doc(db, 'epics', id));
+      await batch.commit();
+    }
+    window.deleteEpic = deleteEpic;
+
+    async function addSprint() {
+      const maxOrder = Math.max(-1, ...sprints.map(s => s.global_order));
+      await addDoc(collection(db, 'sprints'), {
+        epic_id: null,
+        initiative_id: null,
+        description: '',
+        resources: {
+          user_stories: { checked: false, url: '' },
+          prototypes: { checked: false, url: '' },
+          project_files: { checked: false, url: '' }
+        },
+        length_weeks: 2,
+        manual_kickoff: null,
+        global_order: maxOrder + 1
+      });
+    }
+    window.addSprint = addSprint;
+
+    async function deleteSprint(id) {
+      if (!confirm('Delete this sprint?')) return;
+      await deleteDoc(doc(db, 'sprints', id));
+    }
+    window.deleteSprint = deleteSprint;
+
+    async function patchSprint(id, data) {
+      await updateDoc(doc(db, 'sprints', id), data);
+    }
+
+    async function moveSprint(id, dir) {
+      const sorted = [...sprints].sort((a, b) => a.global_order - b.global_order);
+      const idx = sorted.findIndex(s => s.id === id);
+      const target = idx + dir;
+      if (target < 0 || target >= sorted.length) return;
+      const batch = writeBatch(db);
+      batch.update(doc(db, 'sprints', sorted[idx].id), { global_order: sorted[target].global_order });
+      batch.update(doc(db, 'sprints', sorted[target].id), { global_order: sorted[idx].global_order });
+      await batch.commit();
+    }
+    window.moveSprint = moveSprint;
+
+    // ── Inline Edit Helpers ───────────────────────────────────────────────────────
+    function editableDiv(value, onSave, cls = '') {
+      const div = document.createElement('div');
+      div.className = `editable ${cls}`;
+      div.contentEditable = 'true';
+      div.spellcheck = false;
+      div.textContent = value || '';
+      div.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); div.blur(); } });
+      div.addEventListener('blur', () => { onSave(div.textContent.trim()); });
+      return div;
+    }
+
+    // ── Resources Popover ─────────────────────────────────────────────────────────
+    const RESOURCE_LABELS = { user_stories: 'User Stories', prototypes: 'Prototypes', project_files: 'Project Files' };
+
+    function getResourcesArray(resources) {
+      if (Array.isArray(resources)) return resources;
+      // Legacy format: convert checked+url object to array
+      const arr = [];
+      const legacy = resources || {};
+      ['user_stories', 'prototypes', 'project_files'].forEach(key => {
+        if (legacy[key]?.url) arr.push({ name: RESOURCE_LABELS[key], url: legacy[key].url });
+      });
+      return arr;
+    }
+
+    function openPopover(sprintId, index, anchorEl) {
+      const sprint = sprints.find(s => s.id === sprintId);
+      if (!sprint) return;
+      const resources = getResourcesArray(sprint.resources);
+      const existing = (index !== null && index !== undefined) ? resources[index] : null;
+      popoverCtx = { sprintId, index };
+
+      const pop = document.getElementById('link-popover');
+      document.getElementById('popover-title').textContent = existing ? 'Edit Resource' : 'Add Resource';
+      document.getElementById('popover-name').value = existing?.name || '';
+      document.getElementById('popover-url').value = existing?.url || '';
+
+      const rect = anchorEl.getBoundingClientRect();
+      pop.style.top = (rect.bottom + 6) + 'px';
+      pop.style.left = Math.min(rect.left, window.innerWidth - 290) + 'px';
+      pop.classList.add('open');
+      document.getElementById('popover-name').focus();
+    }
+    window.openPopover = openPopover;
+
+    function closePopover() {
+      document.getElementById('link-popover').classList.remove('open');
+      popoverCtx = null;
+    }
+    window.closePopover = closePopover;
+
+    async function savePopover() {
+      if (!popoverCtx) return;
+      const name = document.getElementById('popover-name').value.trim();
+      const url = document.getElementById('popover-url').value.trim();
+      if (!name && !url) { closePopover(); return; }
+      const { sprintId, index } = popoverCtx;
+      const sprint = sprints.find(s => s.id === sprintId);
+      const resources = getResourcesArray(sprint?.resources);
+      if (index !== null && index !== undefined) {
+        resources[index] = { name, url };
+      } else {
+        resources.push({ name: name || url, url });
+      }
+      await patchSprint(sprintId, { resources });
+      closePopover();
+    }
+    window.savePopover = savePopover;
+
+    window.removeResource = async (sprintId, index) => {
+      const sprint = sprints.find(s => s.id === sprintId);
+      const resources = getResourcesArray(sprint?.resources);
+      resources.splice(index, 1);
+      await patchSprint(sprintId, { resources });
+    };
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePopover(); closeSettings(); closeFlyout(); } });
+    document.addEventListener('click', e => {
+      const pop = document.getElementById('link-popover');
+      if (pop.classList.contains('open') && !pop.contains(e.target) && !e.target.closest('[onclick*="openPopover"]')) {
+        closePopover();
+      }
+    });
+
+    // ── Settings Panel ────────────────────────────────────────────────────────────
+    function openSettings() {
+      document.getElementById('s-kickoff-dow').value = settings.kickoff_dow;
+      document.getElementById('s-review-offset').value = settings.review_offset;
+      document.getElementById('s-handoff-offset').value = settings.handoff_offset;
+      document.getElementById('s-release-offset').value = settings.release_offset;
+      document.getElementById('s-lead-time').value = settings.lead_time || 0;
+      updateDowPreview();
+      document.getElementById('panel').classList.add('open');
+      document.getElementById('overlay').classList.add('open');
+    }
+    window.openSettings = openSettings;
+
+    function closeSettings() {
+      document.getElementById('panel').classList.remove('open');
+      document.getElementById('overlay').classList.remove('open');
+    }
+    window.closeSettings = closeSettings;
+
+    function readSettingsForm() {
+      return {
+        kickoff_dow: parseInt(document.getElementById('s-kickoff-dow').value),
+        review_offset: parseInt(document.getElementById('s-review-offset').value) || 0,
+        handoff_offset: parseInt(document.getElementById('s-handoff-offset').value) || 0,
+        release_offset: parseInt(document.getElementById('s-release-offset').value) || 0,
+        lead_time: parseInt(document.getElementById('s-lead-time').value) || 0,
+      };
+    }
+
+    function updateDowPreview() {
+      const s = readSettingsForm();
+      const kickoffDow = s.kickoff_dow;
+      const reviewDow = ((kickoffDow - (s.review_offset % 7)) + 7) % 7;
+      const handoffDow = ((kickoffDow - (s.handoff_offset % 7)) + 7) % 7;
+      const testDow = kickoffDow;
+      const relDow = (kickoffDow + s.release_offset) % 7;
+      const preview = document.getElementById('dow-preview');
+      preview.innerHTML = [
+        { label: 'Review', dow: reviewDow, color: 'var(--color-release)' },
+        { label: 'Handoff', dow: handoffDow, color: 'var(--color-release)' },
+        { label: 'Kickoff', dow: kickoffDow, color: 'var(--color-kickoff)' },
+        { label: 'Test', dow: testDow, color: 'var(--color-test)' },
+        { label: 'Release', dow: relDow, color: 'var(--color-release)' },
+      ].map(({ label, dow, color }) =>
+        `<div class="dow-computed" style="border-left:3px solid ${color}">${label}: <span>${DOW_NAMES[dow]}</span></div>`
+      ).join('');
+    }
+
+    ['s-kickoff-dow', 's-review-offset', 's-handoff-offset', 's-release-offset', 's-lead-time'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', updateDowPreview);
+    });
+
+    // ── Header day-of-week labels ─────────────────────────────────────────────────
+    function updateHeaders() {
+      const s = settings;
+      const kickoffDow = s.kickoff_dow;
+      const reviewDow = ((kickoffDow - (s.review_offset % 7)) + 7) % 7;
+      const handoffDow = ((kickoffDow - (s.handoff_offset % 7)) + 7) % 7;
+      const testDow = kickoffDow;
+      const relDow = (kickoffDow + s.release_offset) % 7;
+
+      const set = (id, text, dow) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = `${text}<br><span style="font-weight:400;font-size:10px;opacity:0.8">${DOW_NAMES[dow]}s</span>`;
+      };
+      set('hdr-review', 'Review', reviewDow);
+      set('hdr-handoff', 'Handoff', handoffDow);
+      set('hdr-kickoff', 'Dev Kickoff', kickoffDow);
+      set('hdr-test', 'Test', testDow);
+      set('hdr-release', 'Release', relDow);
+    }
+
+    // ── Toast ─────────────────────────────────────────────────────────────────────
+    let toastTimer;
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+    }
+
+    // ── Render ────────────────────────────────────────────────────────────────────
+    let currentView = 'table';
+    function render() {
+      const tbody = document.getElementById('tbody');
+      if (!tbody) return;
+      if (currentView === 'calendar') { buildGlobalDropdowns(); renderCalendar(); }
+      if (currentView === 'gantt') { buildGlobalDropdowns(); renderGantt(); }
+
+      // Initiative rail
+      const rail = document.getElementById('init-rail');
+      if (rail) {
+        const hasInits = initiatives.some(i => sprints.some(s => s.initiative_id === i.id));
+        rail.style.display = hasInits ? 'flex' : 'none';
+        const badgesHtml = initiatives
+          .slice().sort((a, b) => a.order - b.order)
+          .filter(init => sprints.some(s => s.initiative_id === init.id))
+          .map(init => {
+            const pal = PALETTE[init.color_index % PALETTE.length];
+            return `<button class="init-rail-btn"
+              style="background:${pal.bg};color:${pal.text};border-color:${pal.border}"
+              onclick="openInitiativeFlyout('${init.id}')">${escHtml(init.name)}</button>`;
+          }).join('');
+        const dropdownsHtml = `<div class="cal-filter-sep" style="margin:0 8px"></div>
+          <div class="cal-dropdown-wrap">
+            <button class="cal-dropdown-btn" id="dd-btn-initiative" onclick="toggleCalDropdown('initiative')">
+              <i class="fa-solid fa-flag chip-icon"></i> Initiative <i class="fa-solid fa-chevron-down chevron"></i>
+            </button>
+            <div class="cal-dropdown-menu" id="dd-menu-initiative">
+              <div class="cal-dropdown-header">Initiatives <button onclick="selectAllCal('initiative')">All</button></div>
+              <div id="dd-items-initiative"></div>
+            </div>
+          </div>
+          <div class="cal-dropdown-wrap">
+            <button class="cal-dropdown-btn" id="dd-btn-epic" onclick="toggleCalDropdown('epic')">
+              <i class="fa-solid fa-layer-group chip-icon"></i> Epic <i class="fa-solid fa-chevron-down chevron"></i>
+            </button>
+            <div class="cal-dropdown-menu" id="dd-menu-epic">
+              <div class="cal-dropdown-header">Epics <button onclick="selectAllCal('epic')">All</button></div>
+              <div id="dd-items-epic"></div>
+            </div>
+          </div>
+          <div class="cal-dropdown-wrap">
+            <button class="cal-dropdown-btn" id="dd-btn-sprint" onclick="toggleCalDropdown('sprint')">
+              <i class="fa-solid fa-bolt chip-icon"></i> Sprint <i class="fa-solid fa-chevron-down chevron"></i>
+            </button>
+            <div class="cal-dropdown-menu" id="dd-menu-sprint">
+              <div class="cal-dropdown-header">Sprints <button onclick="selectAllCal('sprint')">All</button></div>
+              <div id="dd-items-sprint"></div>
+            </div>
+          </div>`;
+        rail.innerHTML = badgesHtml + dropdownsHtml;
+        buildGlobalDropdowns();
+      }
+
+      // Update autocomplete datalists
+      const initList = document.getElementById('initiative-list');
+      if (initList) initList.innerHTML = initiatives.map(i => `<option value="${escHtml(i.name)}">`).join('');
+      const epicList = document.getElementById('epic-list');
+      if (epicList) epicList.innerHTML = epics.map(e => `<option value="${escHtml(e.name)}">`).join('');
+
+      const computed = computeAllSprints(); // sorted by global_order
+      const numMap = computeSprintNumbers();
+
+      // Apply global filters to table
+      const filtered = computed.filter(s => {
+        if (gInitFilter && !gInitFilter.has(s.initiative_id)) return false;
+        if (gEpicFilter && !gEpicFilter.has(s.epic_id)) return false;
+        if (gSprintFilter && !gSprintFilter.has(s.id)) return false;
+        return true;
+      });
+
+      const minOrder = sprints.length > 0 ? Math.min(...sprints.map(s => s.global_order)) : 0;
+
+      let currentYear = 0;
+
+      const html = filtered.map((sprint, idx) => {
+        const init = initiatives.find(i => i.id === sprint.initiative_id);
+        const epic = epics.find(e => e.id === sprint.epic_id);
+        const pal = init ? PALETTE[init.color_index % PALETTE.length] : null;
+        const isFirst = idx === 0;
+        const isLast = idx === filtered.length - 1;
+
+        // Year divider — insert before the first row of each year
+        const rowYears = [sprint.review, sprint.handoff, sprint.kickoff, sprint.test, sprint.release]
+          .map(dateYear).filter(Boolean);
+        const rowMinYear = rowYears.length ? Math.min(...rowYears) : 0;
+        let yearDivider = '';
+        if (rowMinYear && rowMinYear !== currentYear) {
+          currentYear = rowMinYear;
+          yearDivider = `<tr class="year-divider-row">
+            <td colspan="9"><div class="year-divider-label">${rowMinYear}</div></td>
+          </tr>`;
+        }
+
+        // Resources (read-only chips)
+        const resArray = getResourcesArray(sprint.resources);
+        const resHtml = resArray.length
+          ? resArray.map(r => `<div class="resource-chip">
+              <a href="${escHtml(r.url)}" target="_blank" class="resource-chip-name" title="${escHtml(r.url)}">
+                ${escHtml(r.name)}
+              </a>
+            </div>`).join('')
+          : `<span style="font-size:11px;color:var(--text-muted)">—</span>`;
+
+        // Sprint name chip — colored by epic, clickable to read-only view
+        const initColorIndex = init ? init.color_index % INIT_HUES.length : 0;
+        const chipStyle = epic ? epicChipStyle(epic, initColorIndex) : '';
+        const nameCell = `<div style="display:flex;flex-direction:column;gap:4px">
+          <button class="sprint-label-chip" style="${chipStyle}" onclick="openSprintFlyout('${sprint.id}')">${escHtml(sprintLabel(sprint, numMap))}</button>
+          ${sprint.description ? `<span class="sprint-desc-preview" title="${escHtml(sprint.description)}">${escHtml(sprint.description)}</span>` : ''}
+        </div>`;
+
+        // Kickoff cell (read-only in table, editable in flyout)
+        const isFirstSprint = sprint.global_order === minOrder;
+        const kickoffCell = `<span class="date-calc">${fmtDate(sprint.kickoff)}</span>`;
+
+        return yearDivider + `<tr class="${sprint.released ? 'released-row' : ''}">
+      <td style="text-align:center">
+        <div class="order-btns">
+          <button class="order-btn" onclick="moveSprint('${sprint.id}',-1)" ${isFirst ? 'disabled' : ''} title="Move up"><i class="fa-solid fa-caret-up"></i></button>
+          <button class="order-btn" onclick="moveSprint('${sprint.id}',1)" ${isLast ? 'disabled' : ''} title="Move down"><i class="fa-solid fa-caret-down"></i></button>
+        </div>
+      </td>
+      <td>${nameCell}</td>
+      <td><div class="resources-cell">${resHtml}</div></td>
+      <td style="text-align:center" class="uiux-cell">
+        <button class="step-btn ${(sprint.completed_steps || []).includes('review') ? 'done' : ''}" onclick="toggleStep('${sprint.id}','review')">
+          <span class="step-date">${fmtDate(sprint.review)}</span>
+        </button>
+      </td>
+      <td style="text-align:center" class="uiux-cell">
+        <button class="step-btn ${(sprint.completed_steps || []).includes('handoff') ? 'done' : ''}" onclick="toggleStep('${sprint.id}','handoff')">
+          <span class="step-date">${fmtDate(sprint.handoff)}</span>
+        </button>
+      </td>
+      <td style="text-align:center">${kickoffCell}</td>
+      <td style="text-align:center">
+        <button class="step-btn ${(sprint.completed_steps || []).includes('test') ? 'done' : ''}" onclick="toggleStep('${sprint.id}','test')">
+          <span class="step-date">${fmtDate(sprint.test)}</span>
+        </button>
+      </td>
+      <td style="text-align:center">
+        <button class="step-btn ${sprint.released ? 'release-done' : ''}" onclick="toggleStep('${sprint.id}','release')"
+          title="${sprint.released ? 'Click to un-release' : 'Mark as released'}">
+          <span class="step-date">${fmtDate(sprint.release)}</span>
+        </button>
+      </td>
+      <td>
+        <div style="display:flex;gap:4px;align-items:center;justify-content:flex-end">
+          <button class="btn-icon" onclick="openSprintEditFlyout('${sprint.id}')" title="Edit sprint"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button class="btn-icon danger" onclick="deleteSprint('${sprint.id}')" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+      </td>
+    </tr>`;
+      }).join('');
+
+      tbody.innerHTML = html;
+    }
+
+    // ── View Toggle ───────────────────────────────────────────────────────────────
+    window.setView = function (v) {
+      currentView = v;
+      document.getElementById('app').style.display = v === 'table' ? 'block' : 'none';
+      document.getElementById('calendar-view').style.display = v === 'calendar' ? 'flex' : 'none';
+      document.getElementById('gantt-view').style.display = v === 'gantt' ? 'flex' : 'none';
+      document.getElementById('view-table-btn').classList.toggle('active', v === 'table');
+      document.getElementById('view-cal-btn').classList.toggle('active', v === 'calendar');
+      document.getElementById('view-gantt-btn').classList.toggle('active', v === 'gantt');
+      if (v === 'calendar') { buildGlobalDropdowns(); renderCalendar(); }
+      if (v === 'gantt') { buildGlobalDropdowns(); renderGantt(); }
+      if (v === 'table') render();
+    }
+
+    // ── Calendar ─────────────────────────────────────────────────────────────────
+    const CAL_STEPS = [
+      { key: 'review', label: 'Review', icon: 'fa-magnifying-glass', cls: 'review' },
+      { key: 'handoff', label: 'Handoff', icon: 'fa-layer-group', cls: 'handoff' },
+      { key: 'kickoff', label: 'Dev Kickoff', icon: 'fa-code', cls: 'kickoff' },
+      { key: 'test', label: 'Test', icon: 'fa-flask', cls: 'test' },
+      { key: 'release', label: 'Release', icon: 'fa-rocket', cls: 'release' },
+    ];
+    // Start on current quarter
+    const _now = new Date();
+    let calQuarterStart = Math.floor(_now.getMonth() / 3) * 3; // 0, 3, 6, or 9
+    let calYear = _now.getFullYear();
+    let activeFilters = new Set(['review', 'handoff', 'kickoff', 'test', 'release']);
+    // null = show all; Set of IDs = filtered subset
+    let gInitFilter = null;
+    let gEpicFilter = null;
+    let gSprintFilter = null;
+
+    function buildGlobalDropdowns() {
+      // Initiatives — always show all
+      const initItems = document.getElementById('dd-items-initiative');
+      if (initItems) {
+        initItems.innerHTML = initiatives.map(i =>
+          `<label class="cal-dropdown-item">
+            <input type="checkbox" ${!gInitFilter || gInitFilter.has(i.id) ? 'checked' : ''}
+              onchange="calDropdownChange('initiative','${i.id}',this.checked)">
+            ${escHtml(i.name)}
+          </label>`
+        ).join('');
+      }
+
+      // Epics — only those belonging to visible initiatives
+      const visibleInitIds = gInitFilter ? [...gInitFilter] : initiatives.map(i => i.id);
+      const visibleEpics = epics.filter(e => visibleInitIds.includes(e.initiative_id));
+      const epicItems = document.getElementById('dd-items-epic');
+      if (epicItems) {
+        epicItems.innerHTML = visibleEpics.map(e =>
+          `<label class="cal-dropdown-item">
+            <input type="checkbox" ${!gEpicFilter || gEpicFilter.has(e.id) ? 'checked' : ''}
+              onchange="calDropdownChange('epic','${e.id}',this.checked)">
+            ${escHtml(e.name)}
+          </label>`
+        ).join('') || '<div style="padding:8px 12px;font-size:11px;color:var(--text-muted)">No epics</div>';
+      }
+
+      // Sprints — only those under visible initiatives + visible epics
+      const visibleEpicIds = gEpicFilter ? [...gEpicFilter] : visibleEpics.map(e => e.id);
+      const visibleSprints = computeAllSprints().filter(s =>
+        visibleInitIds.includes(s.initiative_id) && visibleEpicIds.includes(s.epic_id)
+      );
+      const sprintItems = document.getElementById('dd-items-sprint');
+      if (sprintItems) {
+        sprintItems.innerHTML = visibleSprints.map(s =>
+          `<label class="cal-dropdown-item">
+            <input type="checkbox" ${!gSprintFilter || gSprintFilter.has(s.id) ? 'checked' : ''}
+              onchange="calDropdownChange('sprint','${s.id}',this.checked)">
+            ${escHtml(sprintLabel(s, computeSprintNumbers()))}
+          </label>`
+        ).join('') || '<div style="padding:8px 12px;font-size:11px;color:var(--text-muted)">No sprints</div>';
+      }
+
+      // Update button highlight states
+      ['initiative', 'epic', 'sprint'].forEach(t => {
+        const filter = t === 'initiative' ? gInitFilter : t === 'epic' ? gEpicFilter : gSprintFilter;
+        document.getElementById('dd-btn-' + t)?.classList.toggle('has-filter', filter !== null);
+      });
+    }
+
+    window.toggleCalDropdown = (type) => {
+      ['initiative', 'epic', 'sprint'].forEach(t => {
+        const menu = document.getElementById('dd-menu-' + t);
+        if (t === type) menu.classList.toggle('open');
+        else menu.classList.remove('open');
+      });
+    };
+
+    window.calDropdownChange = (type, id, checked) => {
+      // Collect checked IDs from DOM for this dropdown
+      const checkboxes = [...document.querySelectorAll(`#dd-items-${type} input[type=checkbox]`)];
+      const checkedIds = checkboxes.filter(c => c.checked).map(c => {
+        const m = c.getAttribute('onchange').match(/'([^']+)',this/);
+        return m ? m[1] : null;
+      }).filter(Boolean);
+
+      if (type === 'initiative') {
+        const allIds = initiatives.map(i => i.id);
+        gInitFilter = checkedIds.length === allIds.length ? null : new Set(checkedIds);
+        // Reset downstream filters that may no longer be valid
+        if (gEpicFilter) {
+          const visInits = gInitFilter ? [...gInitFilter] : allIds;
+          const validEpicIds = epics.filter(e => visInits.includes(e.initiative_id)).map(e => e.id);
+          const pruned = [...gEpicFilter].filter(id => validEpicIds.includes(id));
+          gEpicFilter = pruned.length === validEpicIds.length ? null : new Set(pruned);
+        }
+        gSprintFilter = null; // reset sprints when initiative changes
+      } else if (type === 'epic') {
+        const visInitIds = gInitFilter ? [...gInitFilter] : initiatives.map(i => i.id);
+        const visEpics = epics.filter(e => visInitIds.includes(e.initiative_id));
+        gEpicFilter = checkedIds.length === visEpics.length ? null : new Set(checkedIds);
+        gSprintFilter = null; // reset sprints when epic changes
+      } else {
+        const visInitIds = gInitFilter ? [...gInitFilter] : initiatives.map(i => i.id);
+        const visEpicIds = gEpicFilter ? [...gEpicFilter] : epics.filter(e => visInitIds.includes(e.initiative_id)).map(e => e.id);
+        const visSprints = computeAllSprints().filter(s => visInitIds.includes(s.initiative_id) && visEpicIds.includes(s.epic_id));
+        gSprintFilter = checkedIds.length === visSprints.length ? null : new Set(checkedIds);
+      }
+
+      buildGlobalDropdowns();
+      if (currentView === 'calendar') renderCalendar();
+      else if (currentView === 'gantt') renderGantt();
+      else render();
+    };
+
+    window.selectAllCal = (type) => {
+      if (type === 'initiative') { gInitFilter = null; gEpicFilter = null; gSprintFilter = null; }
+      else if (type === 'epic') { gEpicFilter = null; gSprintFilter = null; }
+      else { gSprintFilter = null; }
+      buildGlobalDropdowns();
+      if (currentView === 'calendar') renderCalendar();
+      else if (currentView === 'gantt') renderGantt();
+      else render();
+    };
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.cal-dropdown-wrap')) {
+        document.querySelectorAll('.cal-dropdown-menu.open').forEach(m => m.classList.remove('open'));
+      }
+    });
+
+    window.calPrev = () => {
+      calQuarterStart -= 3;
+      if (calQuarterStart < 0) { calQuarterStart = 9; calYear--; }
+      renderCalendar();
+    };
+    window.calNext = () => {
+      calQuarterStart += 3;
+      if (calQuarterStart > 9) { calQuarterStart = 0; calYear++; }
+      renderCalendar();
+    };
+    window.ganttPrev = () => {
+      calQuarterStart -= 3;
+      if (calQuarterStart < 0) { calQuarterStart = 9; calYear--; }
+      renderGantt();
+    };
+    window.ganttNext = () => {
+      calQuarterStart += 3;
+      if (calQuarterStart > 9) { calQuarterStart = 0; calYear++; }
+      renderGantt();
+    };
+    window.toggleFilter = (key) => {
+      if (activeFilters.has(key)) activeFilters.delete(key); else activeFilters.add(key);
+      document.getElementById('fp-' + key).classList.toggle('off', !activeFilters.has(key));
+      renderCalendar();
+    };
+
+    function renderCalendar() {
+      const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const DOW_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']; // Mon=1 … Fri=5
+
+      const endMonth = calQuarterStart + 2;
+      const qLabel = `Q${Math.floor(calQuarterStart / 3) + 1} ${calYear}`;
+      document.getElementById('cal-month-label').textContent = qLabel;
+
+      // Build date→chips map
+      const computed = computeAllSprints();
+      const dateMap = {};
+      computed.forEach(s => {
+        if (gInitFilter && !gInitFilter.has(s.initiative_id)) return;
+        if (gEpicFilter && !gEpicFilter.has(s.epic_id)) return;
+        if (gSprintFilter && !gSprintFilter.has(s.id)) return;
+        const name = sprintLabel(s, computeSprintNumbers());
+        const init = initiatives.find(i => i.id === s.initiative_id);
+        const epic = epics.find(e => e.id === s.epic_id);
+        const initColorIndex = init ? init.color_index % INIT_HUES.length : 0;
+        const chipStyle = epic ? epicChipStyle(epic, initColorIndex) : '';
+        CAL_STEPS.forEach(step => {
+          if (!activeFilters.has(step.key)) return;
+          const dateStr = s[step.key];
+          if (!dateStr) return;
+          if (!dateMap[dateStr]) dateMap[dateStr] = [];
+          dateMap[dateStr].push({ ...step, name, chipStyle, sprintId: s.id });
+        });
+      });
+
+      const todayISO = toISO(new Date());
+
+      // Helper: render one month block
+      function renderMonth(yr, mo) {
+        const daysInMonth = new Date(yr, mo + 1, 0).getDate();
+        // firstDOW: 1=Mon … 5=Fri, 6=Sat, 0=Sun
+        const firstDOW = new Date(yr, mo, 1).getDay(); // 0=Sun … 6=Sat
+        // Convert to Mon-based index (Mon=0 … Fri=4, Sat=5, Sun=6)
+        const firstOffset = (firstDOW + 6) % 7; // Mon-based offset of 1st of month
+
+        let cells = DOW_LABELS.map(d => `<div class="cal-dow-header">${d}</div>`).join('');
+
+        // Leading blanks (only Mon–Fri blanks)
+        const leadBlanks = Math.min(firstOffset, 5); // cap at 5 (whole row)
+        for (let i = 0; i < leadBlanks; i++) cells += `<div class="cal-cell other-month"></div>`;
+
+        // Days of month — skip Sat (dow=6) and Sun (dow=0)
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dow = new Date(yr, mo, d).getDay();
+          if (dow === 0 || dow === 6) continue;
+          const iso = `${yr}-${String(mo + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+          const isToday = iso === todayISO;
+          const chips = renderChips(dateMap[iso] || []);
+          cells += `<div class="cal-cell${isToday ? ' today' : ''}">
+            <div class="cal-day-num"><span class="day-n">${d}</span></div>
+            <div class="cal-chips">${chips}</div>
+          </div>`;
+        }
+
+        return `<div class="cal-month-block">
+          <div class="cal-month-heading">${MONTHS[mo]} ${yr}</div>
+          <div class="cal-grid">${cells}</div>
+        </div>`;
+      }
+
+      let html = '';
+      for (let i = 0; i < 3; i++) {
+        const mo = calQuarterStart + i;
+        const yr = calYear + Math.floor(mo / 12);
+        html += renderMonth(yr, mo % 12);
+      }
+
+      document.getElementById('cal-grid-wrap').innerHTML = html;
+    }
+
+    function renderChips(entries) {
+      return entries.map(e =>
+        `<div class="cal-chip" style="${e.chipStyle};cursor:pointer" onclick="openSprintFlyout('${e.sprintId}')"><i class="fa-solid ${e.icon} chip-icon"></i><span>${escHtml(e.name)}</span></div>`
+      ).join('');
+    }
+
+    // ── Gantt ─────────────────────────────────────────────────────────────────────
+    function renderGantt() {
+      const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const outer = document.getElementById('gantt-scroll-outer');
+      if (!outer) return;
+
+      const qLabel = `Q${Math.floor(calQuarterStart / 3) + 1} ${calYear}`;
+      const qLabelEl = document.getElementById('gantt-quarter-label');
+      if (qLabelEl) qLabelEl.textContent = qLabel;
+
+      const qStart = new Date(calYear, calQuarterStart, 1);
+      const qEndMo = calQuarterStart + 2;
+      const qEndYrOff = Math.floor((qEndMo + 1) / 12);
+      const qEnd = new Date(calYear + qEndYrOff, (qEndMo + 1) % 12, 0);
+      const totalMs = qEnd.getTime() - qStart.getTime() + 86400000;
+
+      function datePct(iso) {
+        if (!iso) return null;
+        const ms = new Date(iso + 'T00:00:00').getTime() - qStart.getTime();
+        return Math.max(0, Math.min(100, ms / totalMs * 100));
+      }
+
+      const computed = computeAllSprints();
+      const numMap = computeSprintNumbers();
+      const todayISO = toISO(new Date());
+
+      const visibleSprints = computed.filter(s => {
+        if (gInitFilter && !gInitFilter.has(s.initiative_id)) return false;
+        if (gEpicFilter && !gEpicFilter.has(s.epic_id)) return false;
+        if (gSprintFilter && !gSprintFilter.has(s.id)) return false;
+        return true;
+      });
+
+      // Week markers (Mondays)
+      const weeks = [];
+      const wd = new Date(qStart);
+      while (wd.getDay() !== 1) wd.setDate(wd.getDate() + 1);
+      while (wd <= qEnd) {
+        weeks.push({ pct: datePct(toISO(wd)), label: `${MONTHS[wd.getMonth()]} ${wd.getDate()}` });
+        wd.setDate(wd.getDate() + 7);
+      }
+
+      const LABEL_W = 220;
+      const ROW_H = 36;
+      const INIT_H = 28;
+      const EPIC_H = 24;
+
+      const usedInits = initiatives
+        .slice().sort((a, b) => a.order - b.order)
+        .filter(i => visibleSprints.some(s => s.initiative_id === i.id));
+
+      let labelRows = '';
+      let barRows = '';
+
+      usedInits.forEach(init => {
+        const pal = PALETTE[init.color_index % PALETTE.length];
+        const initColorIndex = init.color_index % INIT_HUES.length;
+        const usedEpics = epics
+          .filter(e => e.initiative_id === init.id && visibleSprints.some(s => s.epic_id === e.id))
+          .sort((a, b) => a.order - b.order);
+
+        labelRows += `<div class="gantt-label-init" style="height:${INIT_H}px">
+          <span class="init-badge" style="background:${pal.bg};color:${pal.text};border:1px solid ${pal.border};font-size:11px;padding:1px 8px;border-radius:4px">${escHtml(init.name)}</span>
+        </div>`;
+        barRows += `<div class="gantt-bar-row gantt-bar-init" style="height:${INIT_H}px"></div>`;
+
+        usedEpics.forEach(epic => {
+          const epicSprints = visibleSprints.filter(s => s.epic_id === epic.id).sort((a, b) => a.global_order - b.global_order);
+          const chipStyle = epicChipStyle(epic, initColorIndex);
+
+          labelRows += `<div class="gantt-label-epic" style="height:${EPIC_H}px">${escHtml(epic.name)}</div>`;
+          barRows += `<div class="gantt-bar-row gantt-bar-epic" style="height:${EPIC_H}px"></div>`;
+
+          epicSprints.forEach(sprint => {
+            const label = sprintLabel(sprint, numMap);
+            const steps = sprint.completed_steps || [];
+
+            let barHtml = '';
+            if (sprint.review && sprint.release) {
+              const rawLeft = (new Date(sprint.review + 'T00:00:00') - qStart) / totalMs * 100;
+              const rawRight = (new Date(sprint.release + 'T00:00:00') - qStart) / totalMs * 100;
+              const left = Math.max(0, rawLeft);
+              const right = Math.min(100, rawRight);
+              if (right > left) {
+                const spanPct = right - left;
+                const phases = [
+                  { key: 'review', date: sprint.review },
+                  { key: 'handoff', date: sprint.handoff },
+                  { key: 'kickoff', date: sprint.kickoff },
+                  { key: 'test', date: sprint.test },
+                  { key: 'release', date: sprint.release },
+                ];
+                const markers = phases.map(p => {
+                  const pct = datePct(p.date);
+                  if (pct === null) return '';
+                  const localPct = ((pct - left) / spanPct * 100).toFixed(2);
+                  const done = steps.includes(p.key) || (p.key === 'release' && sprint.released);
+                  return `<div class="gantt-marker ${done ? 'done' : ''}" style="left:${localPct}%" title="${p.key}: ${p.date || ''}"></div>`;
+                }).join('');
+                barHtml = `<div class="gantt-bar-inner" style="left:${left.toFixed(2)}%;width:${(right - left).toFixed(2)}%;${chipStyle}" onclick="openSprintFlyout('${sprint.id}')" title="${escHtml(label)}">
+                  ${markers}
+                  <span class="gantt-bar-label">${escHtml(label)}</span>
+                </div>`;
+              }
+            }
+
+            labelRows += `<div class="gantt-label-sprint" style="height:${ROW_H}px">
+              <button class="sprint-label-chip" style="${chipStyle}" onclick="openSprintFlyout('${sprint.id}')">${escHtml(label)}</button>
+            </div>`;
+            barRows += `<div class="gantt-bar-row" style="height:${ROW_H}px;position:relative">${barHtml}</div>`;
+          });
+        });
+      });
+
+      if (!usedInits.length) {
+        outer.innerHTML = `<div style="padding:40px;text-align:center;color:var(--text-muted)">No sprints match the current filters.</div>`;
+        return;
+      }
+
+      const weekHeaderHtml = weeks.map(w =>
+        `<div class="gantt-week-tick" style="left:${w.pct.toFixed(2)}%">${w.label}</div>`
+      ).join('');
+
+      const weekLineHtml = weeks.map(w =>
+        `<div class="gantt-week-line" style="left:${w.pct.toFixed(2)}%"></div>`
+      ).join('');
+
+      const todayPct = datePct(todayISO);
+      const todayLineHtml = todayPct !== null
+        ? `<div class="gantt-today-line" style="left:${todayPct.toFixed(2)}%"></div>` : '';
+
+      outer.innerHTML = `
+        <div class="gantt-inner" style="min-width:900px">
+          <div style="display:flex;height:32px">
+            <div style="width:${LABEL_W}px;min-width:${LABEL_W}px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);position:sticky;left:0;z-index:10"></div>
+            <div style="flex:1;position:relative;height:32px;border-bottom:1px solid var(--border)">${weekHeaderHtml}</div>
+          </div>
+          <div style="display:flex">
+            <div style="width:${LABEL_W}px;min-width:${LABEL_W}px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);position:sticky;left:0;z-index:10">${labelRows}</div>
+            <div style="flex:1;position:relative">${weekLineHtml}${todayLineHtml}${barRows}</div>
+          </div>
+        </div>`;
+    }
+
+    // ── Field Update Handlers ─────────────────────────────────────────────────────
+    window.renameInit = async (id, name) => {
+      if (!name.trim()) return;
+      await updateDoc(doc(db, 'initiatives', id), { name: name.trim() });
+    };
+    window.renameEpic = async (id, name) => {
+      if (!name.trim()) return;
+      await updateDoc(doc(db, 'epics', id), { name: name.trim() });
+    };
+
+    window.updateDesc = async (id, val) => {
+      await patchSprint(id, { description: val.trim() });
+    };
+    window.updateLength = async (id, val) => {
+      const n = parseFloat(val);
+      if (!isNaN(n) && n > 0) await patchSprint(id, { length_weeks: n });
+    };
+    window.setKickoff = async (id, val) => {
+      if (!val) return;
+      await patchSprint(id, { manual_kickoff: val });
+    };
+    window.clearKickoff = async (id) => {
+      await patchSprint(id, { manual_kickoff: null });
+    };
+    window.toggleReleased = async (id) => {
+      const sprint = sprints.find(s => s.id === id);
+      if (!sprint) return;
+      if (!sprint.released) {
+        const computed = computeAllSprints().find(s => s.id === id);
+        await patchSprint(id, {
+          released: true,
+          manual_kickoff: computed.kickoff,
+          frozen_test: computed.test,
+          frozen_release: computed.release,
+        });
+      } else {
+        await patchSprint(id, { released: false, frozen_test: null, frozen_release: null });
+      }
+    };
+
+    window.toggleStep = async (id, step) => {
+      const sprint = sprints.find(s => s.id === id);
+      if (!sprint) return;
+      if (step === 'release') {
+        await toggleReleased(id);
+        return;
+      }
+      const steps = Array.isArray(sprint.completed_steps) ? [...sprint.completed_steps] : [];
+      const idx = steps.indexOf(step);
+      if (idx === -1) steps.push(step); else steps.splice(idx, 1);
+      await patchSprint(id, { completed_steps: steps });
+    };
+
+    // ── Entity Text Inputs ────────────────────────────────────────────────────────
+    window.saveEntityText = async function (input, sprintId, type) {
+      const name = input.value.trim();
+      const sprint = sprints.find(s => s.id === sprintId);
+      if (type === 'initiative') {
+        await resolveAndSaveInitiative(sprintId, name);
+      } else {
+        await resolveAndSaveEpic(sprintId, name, sprint?.initiative_id);
+      }
+    };
+
+    // ── Entity Inline Editing (legacy, kept for internal use) ─────────────────────
+    window.editEntityCell = function (triggerEl, sprintId, type) {
+      const cell = triggerEl.closest('.entity-cell');
+      const sprint = sprints.find(s => s.id === sprintId);
+      const currentId = type === 'initiative' ? sprint?.initiative_id : sprint?.epic_id;
+      const currentName = type === 'initiative'
+        ? initiatives.find(i => i.id === currentId)?.name || ''
+        : epics.find(e => e.id === currentId)?.name || '';
+      const listId = type === 'initiative' ? 'initiative-list' : 'epic-list';
+
+      cell.innerHTML = `<input type="text" class="entity-input"
+    value="${escHtml(currentName)}"
+    list="${listId}"
+    placeholder="${type === 'initiative' ? 'Initiative…' : 'Epic…'}"
+    onblur="saveEntityCell(this,'${sprintId}','${type}')"
+    onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape'){this.dataset.cancel='1';this.blur();}">`;
+      const input = cell.querySelector('input');
+      input.focus();
+      input.select();
+    };
+
+    window.saveEntityCell = async function (input, sprintId, type) {
+      if (input.dataset.cancel) return;
+      const name = input.value.trim();
+      const sprint = sprints.find(s => s.id === sprintId);
+      if (type === 'initiative') {
+        await resolveAndSaveInitiative(sprintId, name);
+      } else {
+        await resolveAndSaveEpic(sprintId, name, sprint?.initiative_id);
+      }
+    };
+
+    async function resolveAndSaveInitiative(sprintId, name) {
+      if (!name) { await patchSprint(sprintId, { initiative_id: null }); return; }
+      let init = initiatives.find(i => i.name.toLowerCase() === name.toLowerCase());
+      if (!init) {
+        const maxOrder = Math.max(0, ...initiatives.map(i => i.order));
+        const color_index = initiatives.length % PALETTE.length;
+        const ref = await addDoc(collection(db, 'initiatives'), { name, order: maxOrder + 1, color_index });
+        await patchSprint(sprintId, { initiative_id: ref.id });
+      } else {
+        await patchSprint(sprintId, { initiative_id: init.id });
+      }
+    }
+
+    async function resolveAndSaveEpic(sprintId, name, initiativeId) {
+      if (!name) { await patchSprint(sprintId, { epic_id: null }); return; }
+      let epic = epics.find(e => e.name.toLowerCase() === name.toLowerCase() && e.initiative_id === initiativeId);
+      if (!epic) epic = epics.find(e => e.name.toLowerCase() === name.toLowerCase());
+      if (!epic) {
+        const maxOrder = Math.max(0, ...epics.map(e => e.order));
+        const siblingCount = epics.filter(e => e.initiative_id === (initiativeId || null)).length;
+        const ref = await addDoc(collection(db, 'epics'), { name, order: maxOrder + 1, initiative_id: initiativeId || null, color_index: siblingCount });
+        await patchSprint(sprintId, { epic_id: ref.id });
+      } else {
+        await patchSprint(sprintId, { epic_id: epic.id });
+      }
+    }
+
+    // ── Flyout Panels ─────────────────────────────────────────────────────────────
+    window.openInitiativeFlyout = function (id) {
+      const init = initiatives.find(i => i.id === id);
+      if (!init) return;
+      const pal = PALETTE[init.color_index % PALETTE.length];
+      const initEpics = epics.filter(e => e.initiative_id === id).sort((a, b) => a.order - b.order);
+      const initSprints = sprints.filter(s => s.initiative_id === id);
+      const released = initSprints.filter(s => s.released).length;
+      const planned = initSprints.filter(s => !s.released).length;
+
+      document.getElementById('flyout-title').innerHTML =
+        `<span class="init-badge" style="background:${pal.bg};color:${pal.text};border:1px solid ${pal.border}">${escHtml(init.name)}</span>`;
+
+      document.getElementById('flyout-body').innerHTML = `
+    <div class="flyout-stats">
+      <div class="flyout-stat"><strong>${planned}</strong>Planned</div>
+      <div class="flyout-stat"><strong>${released}</strong>Released</div>
+      <div class="flyout-stat"><strong>${initEpics.length}</strong>Epics</div>
+    </div>
+    <div class="flyout-section-title">Epics</div>
+    ${initEpics.length === 0 ? '<p class="flyout-empty">No epics yet</p>' :
+          initEpics.map(epic => {
+            const es = sprints.filter(s => s.epic_id === epic.id);
+            const er = es.filter(s => s.released).length;
+            const ep = es.filter(s => !s.released).length;
+            return `<div class="flyout-epic-item" onclick="openEpicFlyout('${epic.id}')">
+          <div>
+            <div class="flyout-epic-name">${escHtml(epic.name)}</div>
+            <div class="flyout-epic-counts">${ep} planned · ${er} released</div>
+          </div>
+          <i class="fa-solid fa-chevron-right" style="color:var(--border)"></i>
+        </div>`;
+          }).join('')
+        }`;
+
+      openFlyout();
+    };
+
+    window.openEpicFlyout = function (id) {
+      const epic = epics.find(e => e.id === id);
+      if (!epic) return;
+      const init = initiatives.find(i => i.id === epic.initiative_id);
+      const pal = init ? PALETTE[init.color_index % PALETTE.length] : null;
+      const computed = computeAllSprints();
+      const numMap = computeSprintNumbers();
+      const epicSprints = computed.filter(s => s.epic_id === id).sort((a, b) => a.global_order - b.global_order);
+
+      document.getElementById('flyout-title').textContent = epic.name;
+
+      document.getElementById('flyout-body').innerHTML = `
+    <div class="flyout-breadcrumbs">
+      ${init ? `<button class="flyout-bc-link" onclick="openInitiativeFlyout('${init.id}')">${escHtml(init.name)}</button>` : ''}
+      ${init ? `<span class="flyout-bc-sep">›</span>` : ''}
+      <span class="flyout-bc-current">${escHtml(epic.name)}</span>
+    </div>
+    ${epicSprints.length === 0 ? '<p class="flyout-empty">No sprints in this epic yet</p>' :
+          epicSprints.map(sprint => {
+            const num = numMap.get(sprint.id) ?? '—';
+            const initColorIndex = init ? init.color_index % INIT_HUES.length : 0;
+            const chipStyle = epicChipStyle(epic, initColorIndex);
+            return `
+        <div class="flyout-sprint-item ${sprint.released ? 'is-released' : ''}" onclick="openSprintFlyout('${sprint.id}')" style="cursor:pointer">
+          <div class="flyout-sprint-header">
+            <span class="sprint-label-chip" style="${chipStyle}">${escHtml(sprintLabel(sprint, numMap))}</span>
+            <span class="flyout-sprint-badge ${sprint.released ? 'released' : 'planned'}">
+              ${sprint.released ? 'Released' : 'Planned'}
+            </span>
+          </div>
+          ${sprint.description ? `<div class="flyout-sprint-desc">${escHtml(sprint.description)}</div>` : ''}
+          <div class="flyout-sprint-dates">
+            <span title="Handoff"><i class="fa-solid fa-layer-group fa-xs"></i> ${fmtDate(sprint.handoff)}</span>
+            <span title="Release"><i class="fa-solid fa-rocket fa-xs"></i> ${fmtDate(sprint.release)}</span>
+          </div>
+        </div>`;
+          }).join('')
+        }`;
+
+      openFlyout();
+    };
+
+    // ── Sprint read-only view ─────────────────────────────────────────────────────
+    window.openSprintFlyout = function (id) {
+      const sprint = sprints.find(s => s.id === id);
+      if (!sprint) return;
+      const computed = computeAllSprints().find(s => s.id === id);
+      const init = initiatives.find(i => i.id === sprint.initiative_id);
+      const epic = epics.find(e => e.id === sprint.epic_id);
+      const resArray = getResourcesArray(sprint.resources);
+      const initColorIndex = init ? init.color_index % INIT_HUES.length : 0;
+      const chipStyle = epic ? epicChipStyle(epic, initColorIndex) : '';
+      const label = sprintLabel(sprint, computeSprintNumbers());
+      const steps = sprint.completed_steps || [];
+      const today = toISO(new Date());
+
+      const stepStatus = (key, date) => {
+        const done = steps.includes(key) || (key === 'release' && sprint.released);
+        const upcoming = !done && date && date > today;
+        if (done) return `<span class="flyout-step-tag done">Complete</span>`;
+        if (upcoming) return `<span class="flyout-step-tag upcoming">Upcoming</span>`;
+        return '';
+      };
+
+      document.getElementById('flyout-title').innerHTML =
+        `<span class="sprint-label-chip" style="${chipStyle}">${escHtml(label)}</span>`;
+
+      document.getElementById('flyout-body').innerHTML = `
+        <div class="flyout-breadcrumbs">
+          ${init ? `<button class="flyout-bc-link" onclick="openInitiativeFlyout('${init.id}')">${escHtml(init.name)}</button><span class="flyout-bc-sep">›</span>` : ''}
+          ${epic ? `<button class="flyout-bc-link" onclick="openEpicFlyout('${epic.id}')">${escHtml(epic.name)}</button><span class="flyout-bc-sep">›</span>` : ''}
+          <span class="flyout-bc-current">${escHtml(label)}</span>
+        </div>
+
+        <div class="setting-group">
+          <h3>Details</h3>
+          <div class="setting-row"><label>Length</label><span class="flyout-detail-val">${sprint.length_weeks || 2} weeks</span></div>
+          ${sprint.description ? `<div class="setting-row" style="align-items:flex-start"><label>Description</label><span class="flyout-detail-val">${escHtml(sprint.description)}</span></div>` : ''}
+        </div>
+
+        <div class="setting-group">
+          <h3>Target Dates</h3>
+          <div class="flyout-dates-list">
+            <div class="flyout-date-row"><span class="flyout-date-label"><i class="fa-solid fa-magnifying-glass fa-xs"></i> Review</span><span class="flyout-date-val">${fmtDate(computed?.review)}</span>${stepStatus('review', computed?.review)}</div>
+            <div class="flyout-date-row"><span class="flyout-date-label"><i class="fa-solid fa-layer-group fa-xs"></i> Handoff</span><span class="flyout-date-val">${fmtDate(computed?.handoff)}</span>${stepStatus('handoff', computed?.handoff)}</div>
+            <div class="flyout-date-row"><span class="flyout-date-label"><i class="fa-solid fa-code fa-xs"></i> Dev Kickoff</span><span class="flyout-date-val">${fmtDate(computed?.kickoff)}</span></div>
+            <div class="flyout-date-row"><span class="flyout-date-label"><i class="fa-solid fa-flask fa-xs"></i> Test</span><span class="flyout-date-val">${fmtDate(computed?.test)}</span>${stepStatus('test', computed?.test)}</div>
+            <div class="flyout-date-row"><span class="flyout-date-label"><i class="fa-solid fa-rocket fa-xs"></i> Release</span><span class="flyout-date-val">${fmtDate(computed?.release)}</span>${stepStatus('release', computed?.release)}</div>
+          </div>
+        </div>
+
+        ${resArray.length ? `<div class="setting-group">
+          <h3>Resources</h3>
+          ${resArray.map(r => `
+            <div class="setting-row">
+              <a href="${escHtml(r.url)}" target="_blank" style="font-size:12px;color:var(--accent)">${escHtml(r.name)}</a>
+            </div>`).join('')}
+        </div>` : ''}
+
+        <div style="margin-top:8px">
+          <button class="btn btn-primary" onclick="openSprintEditFlyout('${id}')">
+            <i class="fa-solid fa-pen-to-square"></i> Edit Sprint
+          </button>
+        </div>`;
+
+      openFlyout();
+    };
+
+    // ── Sprint edit form ──────────────────────────────────────────────────────────
+    window.openSprintEditFlyout = function (id) {
+      const sprint = sprints.find(s => s.id === id);
+      if (!sprint) return;
+      const computed = computeAllSprints().find(s => s.id === id);
+      const init = initiatives.find(i => i.id === sprint.initiative_id);
+      const epic = epics.find(e => e.id === sprint.epic_id);
+      const resArray = getResourcesArray(sprint.resources);
+      const minOrder = sprints.length > 0 ? Math.min(...sprints.map(s => s.global_order)) : 0;
+      const isFirstSprint = sprint.global_order === minOrder;
+
+      document.getElementById('flyout-title').textContent = 'Edit Sprint';
+
+      document.getElementById('flyout-body').innerHTML = `
+        <div class="setting-group">
+          <h3>Details</h3>
+          <div class="setting-row">
+            <label>Initiative</label>
+            <input type="text" class="setting-input" id="edit-initiative" list="initiative-list"
+              value="${escHtml(init?.name || '')}" placeholder="Initiative…"
+              onkeydown="if(event.key==='Enter')this.blur()">
+          </div>
+          <div class="setting-row">
+            <label>Epic</label>
+            <input type="text" class="setting-input" id="edit-epic" list="epic-list"
+              value="${escHtml(epic?.name || '')}" placeholder="Epic…"
+              onkeydown="if(event.key==='Enter')this.blur()">
+          </div>
+          <div class="setting-row">
+            <label>Length (weeks)</label>
+            <input type="number" class="setting-input" id="edit-length" value="${sprint.length_weeks || 2}" min="2" step="2"
+              ${sprint.released ? 'disabled' : ''}
+              onkeydown="if(event.key==='Enter')this.blur()">
+          </div>
+          <div class="setting-row" style="align-items:flex-start">
+            <label>Description</label>
+            <textarea class="setting-input" id="edit-desc"
+              style="resize:vertical;text-align:left;padding:5px 8px;min-height:64px"
+            >${escHtml(sprint.description || '')}</textarea>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <h3>Dev Kickoff</h3>
+          <div class="setting-row">
+            <label>Date<span class="hint">${sprint.manual_kickoff ? 'Manually set' : 'Auto-calculated'}</span></label>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input type="date" class="setting-input" id="edit-kickoff" value="${computed?.kickoff || ''}"
+                min="${kickoffPickerBase(settings.kickoff_dow)}" step="7"
+                ${sprint.released ? 'disabled' : ''}>
+              ${sprint.manual_kickoff && !isFirstSprint ? `<button class="btn-icon" title="Reset to auto" onclick="clearKickoff('${id}');openSprintEditFlyout('${id}')"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <h3>Resources</h3>
+          <div id="flyout-resources-${id}">
+            ${resArray.map((r, i) => `
+              <div class="setting-row">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12px;font-weight:500">${escHtml(r.name)}</div>
+                  <a href="${escHtml(r.url)}" target="_blank" style="font-size:11px;color:var(--accent);word-break:break-all">${escHtml(r.url)}</a>
+                </div>
+                <button class="btn-icon danger" onclick="removeResource('${id}',${i});openSprintEditFlyout('${id}')" title="Remove"><i class="fa-solid fa-xmark"></i></button>
+              </div>`).join('')}
+          </div>
+          <button class="resource-add-btn" style="margin-top:6px" onclick="openPopover('${id}',null,this)"><i class="fa-solid fa-plus"></i> Add resource</button>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button class="btn btn-primary" onclick="saveSprintEdit('${id}')">Save</button>
+          <button class="btn btn-secondary" onclick="openSprintFlyout('${id}')">Cancel</button>
+        </div>`;
+
+      openFlyout();
+    };
+
+    window.saveSprintEdit = async function (id) {
+      const initName = document.getElementById('edit-initiative')?.value.trim();
+      const epicName = document.getElementById('edit-epic')?.value.trim();
+      const length = parseInt(document.getElementById('edit-length')?.value, 10);
+      const desc = document.getElementById('edit-desc')?.value.trim();
+      const kickoff = document.getElementById('edit-kickoff')?.value;
+
+      // Patch simple fields
+      const patch = {};
+      if (!isNaN(length) && length >= 2) patch.length_weeks = length;
+      patch.description = desc;
+      if (kickoff) patch.manual_kickoff = kickoff;
+      await patchSprint(id, patch);
+
+      // Resolve initiative / epic by name
+      await saveEntityText({ value: initName }, id, 'initiative');
+      await saveEntityText({ value: epicName }, id, 'epic');
+
+      openSprintFlyout(id);
+    };
+
+    function openFlyout() {
+      document.getElementById('flyout-panel').classList.add('open');
+      document.getElementById('flyout-overlay').classList.add('open');
+    }
+    window.closeFlyout = function () {
+      document.getElementById('flyout-panel').classList.remove('open');
+      document.getElementById('flyout-overlay').classList.remove('open');
+    };
+
+    // ── Helpers ───────────────────────────────────────────────────────────────────
+    function escHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // ── Seed Data ─────────────────────────────────────────────────────────────────
+    async function seedIfEmpty() {
+      const existingInits = await getDocs(collection(db, 'initiatives'));
+      if (!existingInits.empty) return;
+
+      const batch = writeBatch(db);
+
+      // Settings
+      batch.set(doc(db, 'settings', 'config'), {
+        kickoff_dow: 3, review_offset: 15, handoff_offset: 1, release_offset: 1, lead_time: 0
+      });
+
+      // Initiatives
+      const platRef = doc(collection(db, 'initiatives'));
+      batch.set(platRef, { name: 'Platinum', order: 0, color_index: 0 });
+      const genRef = doc(collection(db, 'initiatives'));
+      batch.set(genRef, { name: 'General', order: 1, color_index: 1 });
+
+      // Epics
+      const custRef = doc(collection(db, 'epics'));
+      batch.set(custRef, { initiative_id: platRef.id, name: 'Customer Maintenance', order: 0 });
+      const jobRef = doc(collection(db, 'epics'));
+      batch.set(jobRef, { initiative_id: platRef.id, name: 'Job Maintenance', order: 1 });
+      const ticketRef = doc(collection(db, 'epics'));
+      batch.set(ticketRef, { initiative_id: genRef.id, name: 'Tickets', order: 0 });
+
+      // Sprints (global_order follows original sheet row order)
+      const sprintData = [
+        {
+          epic_id: custRef.id, initiative_id: platRef.id,
+          sprint_number: '1.5', global_order: 0,
+          description: 'Customers will be able to View/Edit Customer Information',
+          resources: {
+            user_stories: { checked: true, url: '' },
+            prototypes: { checked: true, url: '' },
+            project_files: { checked: true, url: '' }
+          },
+          length_weeks: 4, manual_kickoff: '2026-07-01'
+        },
+        {
+          epic_id: custRef.id, initiative_id: platRef.id,
+          sprint_number: '1.51', global_order: 1,
+          description: 'Add general contact, MM logins, feedback flyout',
+          resources: { user_stories: { checked: false, url: '' }, prototypes: { checked: false, url: '' }, project_files: { checked: false, url: '' } },
+          length_weeks: 2, manual_kickoff: null
+        },
+        {
+          epic_id: jobRef.id, initiative_id: platRef.id,
+          sprint_number: '1.25', global_order: 2,
+          description: 'View/Edit Print jobs with feedback flyout',
+          resources: { user_stories: { checked: false, url: '' }, prototypes: { checked: false, url: '' }, project_files: { checked: false, url: '' } },
+          length_weeks: 4, manual_kickoff: null
+        },
+        {
+          epic_id: ticketRef.id, initiative_id: genRef.id,
+          sprint_number: '1.5', global_order: 3,
+          description: 'iron PDF? rework ticket generation in preparation for job maintenance changes',
+          resources: { user_stories: { checked: false, url: '' }, prototypes: { checked: false, url: '' }, project_files: { checked: false, url: '' } },
+          length_weeks: 4, manual_kickoff: null
+        },
+        {
+          epic_id: custRef.id, initiative_id: platRef.id,
+          sprint_number: '1.75', global_order: 4,
+          description: 'Full Management',
+          resources: { user_stories: { checked: false, url: '' }, prototypes: { checked: false, url: '' }, project_files: { checked: false, url: '' } },
+          length_weeks: 4, manual_kickoff: null
+        },
+        {
+          epic_id: jobRef.id, initiative_id: platRef.id,
+          sprint_number: '1.75', global_order: 5,
+          description: 'Full Management',
+          resources: { user_stories: { checked: false, url: '' }, prototypes: { checked: false, url: '' }, project_files: { checked: false, url: '' } },
+          length_weeks: 8, manual_kickoff: null
+        },
+      ];
+
+      sprintData.forEach(s => {
+        const ref = doc(collection(db, 'sprints'));
+        batch.set(ref, s);
+      });
+
+      await batch.commit();
+      console.log('Seeded initial data');
+    }
+
+    // ── Firestore Listeners ───────────────────────────────────────────────────────
+    function checkAllLoaded() {
+      if (Object.values(loaded).every(v => v)) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        document.getElementById('init-rail').style.display = 'flex';
+        document.getElementById('conn-dot').className = 'dot green';
+        document.getElementById('conn-dot').title = 'Connected';
+        updateHeaders();
+        render();
+      }
+    }
+
+    onSnapshot(doc(db, 'settings', 'config'), snap => {
+      if (snap.exists()) settings = { ...settings, ...snap.data() };
+      loaded.settings = true;
+      updateHeaders();
+      checkAllLoaded();
+      if (loaded.sprints) render();
+    });
+
+    onSnapshot(query(collection(db, 'initiatives'), orderBy('order')), snap => {
+      initiatives = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      loaded.initiatives = true;
+      checkAllLoaded();
+      if (Object.values(loaded).every(v => v)) render();
+    });
+
+    onSnapshot(query(collection(db, 'epics'), orderBy('order')), snap => {
+      const raw = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      // Assign color_index to any epic that doesn't have one (created before this feature).
+      // Group by initiative, then stamp each epic's position as its index.
+      const countPerInit = {};
+      epics = raw.map(e => {
+        if (e.color_index != null) return e;
+        const initId = e.initiative_id || '__none__';
+        if (countPerInit[initId] == null) countPerInit[initId] = 0;
+        return { ...e, color_index: countPerInit[initId]++ };
+      });
+      loaded.epics = true;
+      checkAllLoaded();
+      if (Object.values(loaded).every(v => v)) render();
+    });
+
+    onSnapshot(query(collection(db, 'sprints'), orderBy('global_order')), snap => {
+      sprints = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      loaded.sprints = true;
+      checkAllLoaded();
+      if (Object.values(loaded).every(v => v)) {
+        render();
+        pruneOrphans();
+      }
+    });
+
+    async function pruneOrphans() {
+      const batch = writeBatch(db);
+      let changes = 0;
+      initiatives.forEach(init => {
+        if (!sprints.some(s => s.initiative_id === init.id)) {
+          batch.delete(doc(db, 'initiatives', init.id));
+          changes++;
+        }
+      });
+      epics.forEach(epic => {
+        if (!sprints.some(s => s.epic_id === epic.id)) {
+          batch.delete(doc(db, 'epics', epic.id));
+          changes++;
+        }
+      });
+      if (changes) await batch.commit();
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────────
+    (async () => {
+      try {
+        await seedIfEmpty();
+      } catch (e) {
+        // May fail if data already exists, that's fine
+        console.log('Seed check:', e.message);
+      }
+    })();
+  </script>
+</body>
+
+</html>
