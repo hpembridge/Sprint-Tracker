@@ -272,7 +272,7 @@
     }
 
     tbody tr:hover .row-actions,
-    tbody tr:hover .order-btns {
+    tbody tr:hover .drag-handle {
       opacity: 1;
     }
 
@@ -395,7 +395,7 @@
       pointer-events: none;
     }
 
-    tr.released-row .order-btns {
+    tr.released-row .drag-handle {
       display: none;
     }
 
@@ -428,28 +428,41 @@
       transition: opacity 0.1s;
     }
 
-    .order-btns {
+    /* ── Drag handle ── */
+    .drag-handle {
       display: flex;
-      flex-direction: column;
-      gap: 1px;
-      opacity: 0;
-      transition: opacity 0.1s;
-    }
-
-    .order-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      margin: 0 auto;
+      border-radius: 4px;
       color: var(--text-muted);
-      font-size: 10px;
-      line-height: 1;
-      padding: 1px 3px;
-      border-radius: 2px;
+      opacity: 0;
+      transition: opacity 0.15s, color 0.15s, background 0.15s;
+      cursor: grab;
     }
+    .drag-handle:active { cursor: grabbing; }
+    .drag-handle:hover { color: var(--text); background: var(--border); }
 
-    .order-btn:hover {
-      background: var(--bg);
-      color: var(--text);
+    /* ── Drag state ── */
+    tr.dragging { opacity: 0.35; }
+    tr.dragging td { background: transparent !important; }
+
+    /* Drop zone lines */
+    tr.drop-above > td { border-top: 2px solid var(--accent) !important; }
+    tr.drop-below > td { border-bottom: 2px solid var(--accent) !important; }
+
+    /* ── Date cascade animation ── */
+    @keyframes date-cascade {
+      0%   { color: var(--accent); transform: translateY(-2px); }
+      60%  { transform: translateY(0); }
+      100% { color: inherit; }
+    }
+    tr.sprint-moved .date-calc,
+    tr.sprint-moved .step-date {
+      animation: date-cascade 0.7s ease-out both;
+      animation-delay: var(--cascade-delay, 0ms);
     }
 
     /* ── Sprint name cell ── */
@@ -2010,6 +2023,89 @@
 
     // ── Render ────────────────────────────────────────────────────────────────────
     let currentView = 'table';
+
+    // ── Drag-and-drop reorder ─────────────────────────────────────────────────────
+    // Map<sprintId, cascadeDelayMs> — populated on drop, consumed and cleared in render()
+    const recentlyMoved = new Map();
+    let dragSrcId = null;
+
+    (() => {
+      const tbody = document.getElementById('tbody');
+
+      tbody.addEventListener('dragstart', e => {
+        // Don't hijack clicks on interactive children
+        if (e.target.closest('button, a, input, select')) { e.preventDefault(); return; }
+        const row = e.target.closest('tr[data-sprint-id]');
+        if (!row) return;
+        dragSrcId = row.dataset.sprintId;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', dragSrcId);
+        // Delay opacity so drag ghost captures the full-opacity row first
+        requestAnimationFrame(() => row.classList.add('dragging'));
+      });
+
+      tbody.addEventListener('dragover', e => {
+        e.preventDefault();
+        const row = e.target.closest('tr[data-sprint-id]');
+        if (!row || row.dataset.sprintId === dragSrcId) return;
+        e.dataTransfer.dropEffect = 'move';
+        // Clear old indicators
+        tbody.querySelectorAll('.drop-above, .drop-below').forEach(r => r.classList.remove('drop-above', 'drop-below'));
+        const mid = row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
+        row.classList.add(e.clientY < mid ? 'drop-above' : 'drop-below');
+      });
+
+      tbody.addEventListener('dragleave', e => {
+        // Only clear if leaving the row entirely (not moving to a child)
+        const row = e.target.closest('tr[data-sprint-id]');
+        if (row && !row.contains(e.relatedTarget)) {
+          row.classList.remove('drop-above', 'drop-below');
+        }
+      });
+
+      tbody.addEventListener('dragend', () => {
+        tbody.querySelectorAll('.dragging, .drop-above, .drop-below')
+          .forEach(r => r.classList.remove('dragging', 'drop-above', 'drop-below'));
+        dragSrcId = null;
+      });
+
+      tbody.addEventListener('drop', async e => {
+        e.preventDefault();
+        const row = e.target.closest('tr[data-sprint-id]');
+        if (!row || !dragSrcId || row.dataset.sprintId === dragSrcId) return;
+
+        const dropAbove = row.classList.contains('drop-above');
+        tbody.querySelectorAll('.dragging, .drop-above, .drop-below')
+          .forEach(r => r.classList.remove('dragging', 'drop-above', 'drop-below'));
+
+        // Build new order
+        const sorted = computeAllSprints();
+        const srcSprint = sorted.find(s => s.id === dragSrcId);
+        if (!srcSprint) return;
+
+        const without = sorted.filter(s => s.id !== dragSrcId);
+        const targetIdx = without.findIndex(s => s.id === row.dataset.sprintId);
+        if (targetIdx === -1) return;
+        without.splice(dropAbove ? targetIdx : targetIdx + 1, 0, srcSprint);
+
+        // Detect which sprints changed position
+        const prevOrderMap = new Map(sorted.map(s => [s.id, s.global_order]));
+        const batch = writeBatch(db);
+        let cascadeIdx = 0;
+        without.forEach((s, i) => {
+          const newOrder = i * 1000;
+          if (prevOrderMap.get(s.id) !== newOrder) {
+            batch.update(doc(db, 'sprints', s.id), { global_order: newOrder });
+            // Stagger cascade delay: dragged sprint first, then others in order
+            recentlyMoved.set(s.id, s.id === dragSrcId ? 0 : ++cascadeIdx * 60);
+          }
+        });
+
+        dragSrcId = null;
+        await batch.commit();
+        // render() is triggered by onSnapshot; recentlyMoved is consumed there
+      });
+    })();
     function render() {
       const tbody = document.getElementById('tbody');
       if (!tbody) return;
@@ -2124,12 +2220,12 @@
         const isFirstSprint = sprint.global_order === minOrder;
         const kickoffCell = `<span class="date-calc">${fmtDate(sprint.kickoff)}</span>`;
 
-        return yearDivider + `<tr class="${sprint.released ? 'released-row' : ''}">
+        const cascadeDelay = recentlyMoved.get(sprint.id);
+        const movedClass = cascadeDelay != null ? 'sprint-moved' : '';
+        const cascadeStyle = cascadeDelay != null ? `style="--cascade-delay:${cascadeDelay}ms"` : '';
+        return yearDivider + `<tr class="${sprint.released ? 'released-row' : ''} ${movedClass}" ${cascadeStyle} draggable="true" data-sprint-id="${sprint.id}">
       <td style="text-align:center">
-        <div class="order-btns">
-          <button class="order-btn" onclick="moveSprint('${sprint.id}',-1)" ${isFirst ? 'disabled' : ''} title="Move up"><i class="fa-solid fa-caret-up"></i></button>
-          <button class="order-btn" onclick="moveSprint('${sprint.id}',1)" ${isLast ? 'disabled' : ''} title="Move down"><i class="fa-solid fa-caret-down"></i></button>
-        </div>
+        <div class="drag-handle" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></div>
       </td>
       <td>${nameCell}</td>
       <td><div class="resources-cell">${resHtml}</div></td>
@@ -2165,6 +2261,7 @@
       }).join('');
 
       tbody.innerHTML = html;
+      recentlyMoved.clear();
     }
 
     // ── View Toggle ───────────────────────────────────────────────────────────────
