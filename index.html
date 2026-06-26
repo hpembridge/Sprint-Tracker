@@ -209,6 +209,7 @@
     #init-rail {
       display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
       padding: 16px 0px;
+      justify-content: center;
     }
     .init-rail-btn {
       display: inline-flex; align-items: center;
@@ -222,6 +223,10 @@
 
     #app, #init-rail, #calendar-view, #gantt-view{
       max-width: 1600px;
+      margin: auto;
+    }
+    #lane-view{
+      max-width: 850px;
       margin: auto;
     }
     #gantt-view, #calendar-view{
@@ -1404,6 +1409,120 @@
       margin-left: -4px; z-index: 3;
     }
     .gantt-marker.done { background: #4ade80; }
+
+    /* ── Lane View ── */
+    #lane-view { display: none; }
+    .lane-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+      align-items: start;
+    }
+    .lane {
+      background: var(--surface);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+
+    }
+    .lane-header {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--border), white 60%);
+    }
+    .lane-header-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .lane-count-badge {
+      background: var(--accent);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 99px;
+      padding: 1px 7px;
+      min-width: 20px;
+      text-align: center;
+    }
+    .lane-cards {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .lane-empty {
+      padding: 24px 16px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .lane-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-left-width: 3px;
+      border-radius: 7px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: box-shadow 0.1s;
+    }
+
+    .lane-card:not(:first-child){
+      display: none;
+    }
+    .lane-card:hover {
+      opacity: 1;
+    }
+    .lane-card-head {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .lane-card-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .lane-card-action {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .lane-card-action .step-btn {
+      width: auto;
+      flex: 1;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .lane-dev-dates {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 2px 0;
+    }
+    .lane-dev-dates .lane-date-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
   </style>
 </head>
 
@@ -1418,6 +1537,8 @@
         Calendar</button>
       <button id="view-gantt-btn" onclick="setView('gantt')"><i class="fa-solid fa-chart-gantt"></i>
         Gantt</button>
+      <button id="view-lane-btn" onclick="setView('lane')"><i class="fa-solid fa-columns"></i>
+        Lanes</button>
     </div>
     <div class="header-right">
       <span id="conn-dot" class="dot grey" title="Connecting..."></span>
@@ -1431,7 +1552,7 @@
 
   <main>
     <div id="loading">
-      <div class="spinner"></div> Connecting to Firestore…
+      <div class="spinner"></div> <span id="load-msg">Connecting to Firestore…</span>
     </div>
     <div id="init-rail" style="display:none"></div>
     <div id="app" style="display:none">
@@ -1482,6 +1603,8 @@
       </div>
       <div class="cal-grid-wrap" id="cal-grid-wrap"></div>
     </div>
+    <!-- Lane View -->
+    <div id="lane-view"></div>
     <!-- Gantt View -->
     <div id="gantt-view" style="display:none; flex-direction:column; min-height:calc(100vh - 300px)">
       <div class="gantt-toolbar">
@@ -1820,11 +1943,7 @@
         epic_id: null,
         initiative_id: null,
         description: '',
-        resources: {
-          user_stories: { checked: false, url: '' },
-          prototypes: { checked: false, url: '' },
-          project_files: { checked: false, url: '' }
-        },
+        resources: [],
         length_weeks: 2,
         manual_kickoff: null,
         global_order: maxOrder + 1
@@ -2106,11 +2225,130 @@
         // render() is triggered by onSnapshot; recentlyMoved is consumed there
       });
     })();
+    // ── Lane View ─────────────────────────────────────────────────────────────────
+    function renderLaneView() {
+      const laneView = document.getElementById('lane-view');
+      if (!laneView) return;
+
+      const computed = computeAllSprints();
+      const numMap = computeSprintNumbers();
+
+      // Apply global filters
+      const filtered = computed.filter(s => {
+        if (gInitFilter && !gInitFilter.has(s.initiative_id)) return false;
+        if (gEpicFilter && !gEpicFilter.has(s.epic_id)) return false;
+        if (gSprintFilter && !gSprintFilter.has(s.id)) return false;
+        return true;
+      });
+
+      // Helper: left-border color derived from epic/initiative hue
+      function borderColor(s) {
+        const init = initiatives.find(i => i.id === s.initiative_id);
+        const epic = epics.find(e => e.id === s.epic_id);
+        const base = INIT_HUES[(init?.color_index ?? 0) % INIT_HUES.length];
+        const hue = epic ? (base + (epic.color_index ?? 0) * EPIC_HUE_STEP) % 360 : base;
+        return `hsl(${hue} 60% 50%)`;
+      }
+
+      // Helper: sprint label chip HTML
+      function chipHtml(s) {
+        const init = initiatives.find(i => i.id === s.initiative_id);
+        const epic = epics.find(e => e.id === s.epic_id);
+        const initColorIndex = (init?.color_index ?? 0) % INIT_HUES.length;
+        const style = epic ? epicChipStyle(epic, initColorIndex) : '';
+        const label = sprintLabel(s, numMap);
+        return `<button class="sprint-label-chip" style="${style}" onclick="openSprintFlyout('${s.id}')">${escHtml(label)}</button>`;
+      }
+
+      // Build chip lists per lane
+      const designChips = [];
+      const testChips   = [];
+      const devChips    = [];
+
+      filtered.forEach(s => {
+        const done = s.completed_steps || [];
+        if (!done.includes('review'))  designChips.push({ s, step: 'review',  date: s.review });
+        if (!done.includes('handoff')) designChips.push({ s, step: 'handoff', date: s.handoff });
+        if (!done.includes('test'))    testChips.push(  { s, step: 'test',    date: s.test });
+        if (!s.released)               devChips.push(   { s, step: 'release', date: s.kickoff });
+      });
+
+      // Sort each lane by date ascending
+      const byDate = (a, b) => (a.date || '').localeCompare(b.date || '');
+      designChips.sort(byDate);
+      testChips.sort(byDate);
+      devChips.sort(byDate);
+
+      const STEP_META = {
+        review:  { icon: 'fa-magnifying-glass', label: 'Review' },
+        handoff: { icon: 'fa-layer-group',       label: 'Handoff' },
+        test:    { icon: 'fa-flask',             label: 'Test' },
+        release: { icon: 'fa-rocket',            label: 'Release' },
+      };
+
+      function renderCard({ s, step, date }) {
+        const meta = STEP_META[step];
+        const isDone = step === 'release' ? s.released : (s.completed_steps || []).includes(step);
+        const headHtml = `<div class="lane-card-head">
+            ${chipHtml(s)}
+            ${s.description ? `<div class="lane-card-desc">${escHtml(s.description)}</div>` : ''}
+          </div>`;
+
+        if (step === 'release') {
+          return `<div class="lane-card" style="border-left-color:${borderColor(s)}">
+            ${headHtml}
+            <div class="lane-dev-dates">
+              <span class="lane-date-item"><i class="fa-solid fa-code" style="font-size:9px"></i> ${fmtDate(s.kickoff)}</span>
+              <i class="fa-solid fa-arrow-right" style="font-size:9px;opacity:0.35"></i>
+              <span class="lane-date-item"><i class="fa-solid fa-rocket" style="font-size:9px"></i> ${fmtDate(s.release)}</span>
+            </div>
+            <div class="lane-card-action">
+              <button class="step-btn ${isDone ? 'release-done' : ''}" onclick="toggleStep('${s.id}','release')">
+                <i class="fa-solid ${meta.icon}" style="font-size:10px"></i>
+                ${meta.label} &nbsp;·&nbsp; <span class="step-date">${fmtDate(s.release)}</span>
+              </button>
+            </div>
+          </div>`;
+        }
+
+        return `<div class="lane-card" style="border-left-color:${borderColor(s)}">
+          ${headHtml}
+          <div class="lane-card-action">
+            <button class="step-btn ${isDone ? 'done' : ''}" onclick="toggleStep('${s.id}','${step}')">
+              <i class="fa-solid ${meta.icon}" style="font-size:10px"></i>
+              ${meta.label} &nbsp;·&nbsp; <span class="step-date">${fmtDate(date)}</span>
+            </button>
+          </div>
+        </div>`;
+      }
+
+      function buildLane(title, icon, chips) {
+        const cards = chips.length
+          ? chips.map(renderCard).join('')
+          : `<div class="lane-empty"><i class="fa-solid fa-circle-check" style="color:var(--dot-green);margin-right:5px"></i>All clear</div>`;
+        const badge = chips.length ? `<span class="lane-count-badge">${chips.length}</span>` : '';
+        return `<div class="lane">
+          <div class="lane-header">
+            <div class="lane-header-title"><i class="fa-solid ${icon}"></i> ${title}</div>
+            ${badge}
+          </div>
+          <div class="lane-cards">${cards}</div>
+        </div>`;
+      }
+
+      laneView.innerHTML = `<div class="lane-grid">
+        ${buildLane('Design',      'fa-pen-ruler', designChips)}
+        ${buildLane('Test',        'fa-flask',     testChips)}
+        ${buildLane('Development', 'fa-code',      devChips)}
+      </div>`;
+    }
+
     function render() {
       const tbody = document.getElementById('tbody');
       if (!tbody) return;
       if (currentView === 'calendar') { buildGlobalDropdowns(); renderCalendar(); }
       if (currentView === 'gantt') { buildGlobalDropdowns(); renderGantt(); }
+      if (currentView === 'lane') renderLaneView();
 
       // Initiative rail
       const rail = document.getElementById('init-rail');
@@ -2270,11 +2508,14 @@
       document.getElementById('app').style.display = v === 'table' ? 'block' : 'none';
       document.getElementById('calendar-view').style.display = v === 'calendar' ? 'flex' : 'none';
       document.getElementById('gantt-view').style.display = v === 'gantt' ? 'flex' : 'none';
+      document.getElementById('lane-view').style.display = v === 'lane' ? 'block' : 'none';
       document.getElementById('view-table-btn').classList.toggle('active', v === 'table');
       document.getElementById('view-cal-btn').classList.toggle('active', v === 'calendar');
       document.getElementById('view-gantt-btn').classList.toggle('active', v === 'gantt');
+      document.getElementById('view-lane-btn').classList.toggle('active', v === 'lane');
       if (v === 'calendar') { buildGlobalDropdowns(); renderCalendar(); }
       if (v === 'gantt') { buildGlobalDropdowns(); renderGantt(); }
+      if (v === 'lane') renderLaneView();
       if (v === 'table') render();
     }
 
@@ -2974,7 +3215,9 @@
           <div class="setting-row">
             <label>Date<span class="hint">${sprint.manual_kickoff ? 'Manually set' : 'Auto-calculated'}</span></label>
             <div style="display:flex;gap:6px;align-items:center">
-              <input type="date" class="setting-input" id="edit-kickoff" value="${computed?.kickoff || ''}"
+              <input type="date" class="setting-input" id="edit-kickoff" value="${sprint.manual_kickoff || computed?.kickoff || ''}"
+                data-auto="${computed?.kickoff || ''}"
+                data-was-manual="${sprint.manual_kickoff ? 'true' : 'false'}"
                 min="${kickoffPickerBase(settings.kickoff_dow)}" step="7"
                 ${sprint.released ? 'disabled' : ''}>
               ${sprint.manual_kickoff && !isFirstSprint ? `<button class="btn-icon" title="Reset to auto" onclick="clearKickoff('${id}');openSprintEditFlyout('${id}')"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
@@ -3010,13 +3253,17 @@
       const epicName = document.getElementById('edit-epic')?.value.trim();
       const length = parseInt(document.getElementById('edit-length')?.value, 10);
       const desc = document.getElementById('edit-desc')?.value.trim();
-      const kickoff = document.getElementById('edit-kickoff')?.value;
+      const kickoffEl = document.getElementById('edit-kickoff');
+      const kickoff = kickoffEl?.value;
+      const wasManual = kickoffEl?.dataset.wasManual === 'true';
+      const autoKickoff = kickoffEl?.dataset.auto;
 
       // Patch simple fields
       const patch = {};
       if (!isNaN(length) && length >= 2) patch.length_weeks = length;
       patch.description = desc;
-      if (kickoff) patch.manual_kickoff = kickoff;
+      // Only pin manual_kickoff if the sprint already had one, or the user changed the date
+      if (kickoff && (wasManual || kickoff !== autoKickoff)) patch.manual_kickoff = kickoff;
       await patchSprint(id, patch);
 
       // Resolve initiative / epic by name
@@ -3077,47 +3324,37 @@
           epic_id: custRef.id, initiative_id: platRef.id,
           sprint_number: '1.5', global_order: 0,
           description: 'Customers will be able to View/Edit Customer Information',
-          resources: {
-            user_stories: { checked: true, url: '' },
-            prototypes: { checked: true, url: '' },
-            project_files: { checked: true, url: '' }
-          },
-          length_weeks: 4, manual_kickoff: '2026-07-01'
+          resources: [], length_weeks: 4, manual_kickoff: '2026-07-01'
         },
         {
           epic_id: custRef.id, initiative_id: platRef.id,
           sprint_number: '1.51', global_order: 1,
           description: 'Add general contact, MM logins, feedback flyout',
-          resources: { user_stories: { checked: false, url: '' }, prototypes: { checked: false, url: '' }, project_files: { checked: false, url: '' } },
-          length_weeks: 2, manual_kickoff: null
+          resources: [], length_weeks: 2, manual_kickoff: null
         },
         {
           epic_id: jobRef.id, initiative_id: platRef.id,
           sprint_number: '1.25', global_order: 2,
           description: 'View/Edit Print jobs with feedback flyout',
-          resources: { user_stories: { checked: false, url: '' }, prototypes: { checked: false, url: '' }, project_files: { checked: false, url: '' } },
-          length_weeks: 4, manual_kickoff: null
+          resources: [], length_weeks: 4, manual_kickoff: null
         },
         {
           epic_id: ticketRef.id, initiative_id: genRef.id,
           sprint_number: '1.5', global_order: 3,
           description: 'iron PDF? rework ticket generation in preparation for job maintenance changes',
-          resources: { user_stories: { checked: false, url: '' }, prototypes: { checked: false, url: '' }, project_files: { checked: false, url: '' } },
-          length_weeks: 4, manual_kickoff: null
+          resources: [], length_weeks: 4, manual_kickoff: null
         },
         {
           epic_id: custRef.id, initiative_id: platRef.id,
           sprint_number: '1.75', global_order: 4,
           description: 'Full Management',
-          resources: { user_stories: { checked: false, url: '' }, prototypes: { checked: false, url: '' }, project_files: { checked: false, url: '' } },
-          length_weeks: 4, manual_kickoff: null
+          resources: [], length_weeks: 4, manual_kickoff: null
         },
         {
           epic_id: jobRef.id, initiative_id: platRef.id,
           sprint_number: '1.75', global_order: 5,
           description: 'Full Management',
-          resources: { user_stories: { checked: false, url: '' }, prototypes: { checked: false, url: '' }, project_files: { checked: false, url: '' } },
-          length_weeks: 8, manual_kickoff: null
+          resources: [], length_weeks: 8, manual_kickoff: null
         },
       ];
 
@@ -3129,6 +3366,15 @@
       await batch.commit();
       console.log('Seeded initial data');
     }
+    const loadMessages = [
+      'Searching for Grumble Goblins...',
+      'Journeying through the Gold database...',
+      'Grabbing a honeybun...'
+    ]
+    document.addEventListener("DOMContentLoaded", (event) => {
+      const randomIndex = Math.floor(Math.random() * loadMessages.length);
+        document.getElementById("load-msg").textContent = loadMessages[randomIndex]
+    });
 
     // ── Firestore Listeners ───────────────────────────────────────────────────────
     function checkAllLoaded() {
