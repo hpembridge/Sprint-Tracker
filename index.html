@@ -986,7 +986,8 @@
 
     .flyout-stats {
       display: flex;
-      gap: 16px;
+      align-items: center;
+      gap: 0;
       margin-bottom: 20px;
       padding: 12px 14px;
       background: var(--surface);
@@ -1004,6 +1005,35 @@
       font-weight: 700;
       color: var(--text);
       display: block;
+    }
+
+    .flyout-stat-divider {
+      width: 1px;
+      height: 36px;
+      background: var(--border);
+      margin: 0 14px;
+    }
+
+    .flyout-subcounts {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .flyout-subcount {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .flyout-subcount strong {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      min-width: 18px;
+      text-align: right;
     }
 
     .flyout-section-title {
@@ -3237,9 +3267,12 @@
 
       document.getElementById('flyout-body').innerHTML = `
     <div class="flyout-stats">
-      <div class="flyout-stat"><strong>${planned}</strong>Planned</div>
-      <div class="flyout-stat"><strong>${released}</strong>Released</div>
       <div class="flyout-stat"><strong>${initEpics.length}</strong>Epics</div>
+      <div class="flyout-stat-divider"></div>
+      <div class="flyout-subcounts">
+        <div class="flyout-subcount"><strong>${planned}</strong>Planned Sprints</div>
+        <div class="flyout-subcount"><strong>${released}</strong>Released Sprints</div>
+      </div>
     </div>
     <div class="flyout-section-title">Epics</div>
     ${initEpics.length === 0 ? '<p class="flyout-empty">No epics yet</p>' :
