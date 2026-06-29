@@ -439,7 +439,7 @@
       align-items: center;
       justify-content: center;
       width: 28px;
-      height: 28px;
+      align-self: stretch;
       margin: 0 auto;
       border-radius: 4px;
       color: var(--text-muted);
@@ -486,12 +486,11 @@
       padding: 3px 8px;
       border-radius: 5px;
       border: 1px solid transparent;
-      white-space: nowrap;
+      width: 100%;
       cursor: pointer;
       background: none;
       font-family: inherit;
       transition: filter 0.1s;
-      width: fit-content;
     }
 
     .sprint-label-chip:hover {
@@ -591,6 +590,44 @@
       font-size: 11px;
       color: var(--text-muted);
     }
+
+    .desc-toggle-btn {
+      background: none;
+      border: none;
+      display: flex;
+      justify-content: flex-end;
+      width: 10%;
+      text-align: right;
+      cursor: pointer;
+      color: var(--text-muted);
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      padding: 8px 16px 8px 24px;
+      border-radius: 8px;
+    }
+    .desc-toggle-btn:hover {
+      color: var(--text);
+      background-color: color-mix(in srgb, var(--accent), transparent 95%);
+    }
+    .desc-chevron {
+      font-size: 9px;
+      transition: transform 0.15s ease;
+    }
+
+     p:has(+ ul){
+      font-weight: bold;
+     }
+     p:has(+ ul):first-child{
+      margin-top: 4px;
+     }
+     ul{
+      margin: 4px 4px 12px 16px;
+     }
+     li{
+      padding-top: 2px;
+     }
+
 
     /* ── Initiative badge ── */
     .init-badge {
@@ -1478,9 +1515,6 @@
       transition: box-shadow 0.1s;
     }
 
-    .lane-card:not(:first-child){
-      display: none;
-    }
     .lane-card:hover {
       opacity: 1;
     }
@@ -1490,13 +1524,10 @@
       gap: 3px;
     }
     .lane-card-desc {
+      margin-trim: top;
       font-size: 11px;
       color: var(--text-muted);
       line-height: 1.4;
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
     }
     .lane-card-action {
       display: flex;
@@ -1537,8 +1568,8 @@
         Calendar</button>
       <button id="view-gantt-btn" onclick="setView('gantt')"><i class="fa-solid fa-chart-gantt"></i>
         Gantt</button>
-      <button id="view-lane-btn" onclick="setView('lane')"><i class="fa-solid fa-columns"></i>
-        Lanes</button>
+      <button id="view-lane-btn" onclick="setView('lane')"><i class="fa-solid fa-list-check"></i>
+        Up Next</button>
     </div>
     <div class="header-right">
       <span id="conn-dot" class="dot grey" title="Connecting..."></span>
@@ -1561,8 +1592,8 @@
           <thead>
             <tr>
               <th></th>
-              <th style="width:70%">Sprint</th>
-              <th style="width: 30%;">Resources</th>
+              <th style="width:20%">Sprint</th>
+              <th style="width: 50%;">Resources</th>
               <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-review">Review</th>
               <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-handoff">Handoff</th>
               <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-kickoff">Dev Kickoff</th>
@@ -2291,7 +2322,7 @@
         const isDone = step === 'release' ? s.released : (s.completed_steps || []).includes(step);
         const headHtml = `<div class="lane-card-head">
             ${chipHtml(s)}
-            ${s.description ? `<div class="lane-card-desc">${escHtml(s.description)}</div>` : ''}
+            ${s.description ? `<div class="lane-card-desc">${renderDesc(s.description)}</div>` : ''}
           </div>`;
 
         if (step === 'release') {
@@ -2324,7 +2355,7 @@
 
       function buildLane(title, icon, chips) {
         const cards = chips.length
-          ? chips.map(renderCard).join('')
+          ? chips.slice(0, 1).map(renderCard).join('')
           : `<div class="lane-empty"><i class="fa-solid fa-circle-check" style="color:var(--dot-green);margin-right:5px"></i>All clear</div>`;
         const badge = chips.length ? `<span class="lane-count-badge">${chips.length}</span>` : '';
         return `<div class="lane">
@@ -2450,8 +2481,11 @@
         const initColorIndex = init ? init.color_index % INIT_HUES.length : 0;
         const chipStyle = epic ? epicChipStyle(epic, initColorIndex) : '';
         const nameCell = `<div style="display:flex;flex-direction:column;gap:4px">
-          <button class="sprint-label-chip" style="${chipStyle}" onclick="openSprintFlyout('${sprint.id}')">${escHtml(sprintLabel(sprint, numMap))}</button>
-          ${sprint.description ? `<span class="sprint-desc-preview" title="${escHtml(sprint.description)}">${escHtml(sprint.description)}</span>` : ''}
+          <div style="display:flex;align-items:center;gap:4px">
+            <button class="sprint-label-chip" style="${chipStyle}" onclick="openSprintFlyout('${sprint.id}')">${escHtml(sprintLabel(sprint, numMap))}</button>
+            ${sprint.description ? `<button class="desc-toggle-btn" onclick="toggleSprintDesc('${sprint.id}')" title="Toggle description"><i class="fa-solid fa-chevron-left desc-chevron" id="desc-chevron-${sprint.id}"></i></button>` : ''}
+          </div>
+          ${sprint.description ? `<div class="sprint-desc-preview" id="desc-${sprint.id}" style="display:none">${renderDesc(sprint.description)}</div>` : ''}
         </div>`;
 
         // Kickoff cell (read-only in table, editable in flyout)
@@ -3090,7 +3124,7 @@
               ${sprint.released ? 'Released' : 'Planned'}
             </span>
           </div>
-          ${sprint.description ? `<div class="flyout-sprint-desc">${escHtml(sprint.description)}</div>` : ''}
+          ${sprint.description ? `<div class="flyout-sprint-desc">${renderDesc(sprint.description)}</div>` : ''}
           <div class="flyout-sprint-dates">
             <span title="Handoff"><i class="fa-solid fa-layer-group fa-xs"></i> ${fmtDate(sprint.handoff)}</span>
             <span title="Release"><i class="fa-solid fa-rocket fa-xs"></i> ${fmtDate(sprint.release)}</span>
@@ -3137,7 +3171,7 @@
         <div class="setting-group">
           <h3>Details</h3>
           <div class="setting-row"><label>Length</label><span class="flyout-detail-val">${sprint.length_weeks || 2} weeks</span></div>
-          ${sprint.description ? `<div class="setting-row" style="align-items:flex-start"><label>Description</label><span class="flyout-detail-val">${escHtml(sprint.description)}</span></div>` : ''}
+          ${sprint.description ? `<div class="setting-row" style="align-items:flex-start"><label>Description</label><div class="flyout-detail-val">${renderDesc(sprint.description)}</div></div>` : ''}
         </div>
 
         <div class="setting-group">
@@ -3206,6 +3240,7 @@
             <label>Description</label>
             <textarea class="setting-input" id="edit-desc"
               style="resize:vertical;text-align:left;padding:5px 8px;min-height:64px"
+              onkeydown="handleDescKeydown(event)"
             >${escHtml(sprint.description || '')}</textarea>
           </div>
         </div>
@@ -3291,6 +3326,56 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
     }
+
+    // Renders a description string as HTML — bullet lines (starting with •) become
+    // <ul><li> groups; plain lines become <p>. Safe: content is escHtml'd.
+    function renderDesc(raw) {
+      if (!raw) return '';
+      const lines = raw.split('\n');
+      let html = '';
+      let inList = false;
+      for (const line of lines) {
+        const isBullet = /^- /.test(line);
+        if (isBullet) {
+          if (!inList) { html += '<ul>'; inList = true; }
+          html += `<li>${escHtml(line.replace(/^-\s*/, ''))}</li>`;
+        } else {
+          if (inList) { html += '</ul>'; inList = false; }
+          if (line.trim()) html += `<p>${escHtml(line)}</p>`;
+        }
+      }
+      if (inList) html += '</ul>';
+      return html;
+    }
+
+    // Collapse/expand description in the list view.
+    window.toggleSprintDesc = function(id) {
+      const desc    = document.getElementById('desc-' + id);
+      const chevron = document.getElementById('desc-chevron-' + id);
+      if (!desc) return;
+      const opening = desc.style.display === 'none';
+      desc.style.display = opening ? '' : 'none';
+      if (chevron) chevron.style.transform = opening ? 'rotate(-90deg)' : '';
+    };
+
+    // Auto-continue bullet points in the description textarea.
+    // If the current line starts with •, pressing Enter starts the next line with • too.
+    window.handleDescKeydown = function(e) {
+      if (e.key !== 'Enter') return;
+      const ta = e.target;
+      const pos = ta.selectionStart;
+      const text = ta.value;
+      const lineStart = text.lastIndexOf('\n', pos - 1) + 1;
+      const currentLine = text.slice(lineStart, pos);
+      if (/^- /.test(currentLine)) {
+        e.preventDefault();
+        const before = text.slice(0, pos);
+        const after  = text.slice(ta.selectionEnd);
+        ta.value = before + '\n- ' + after;
+        const newPos = pos + 3;
+        ta.setSelectionRange(newPos, newPos);
+      }
+    };
 
     // ── Seed Data ─────────────────────────────────────────────────────────────────
     async function seedIfEmpty() {
