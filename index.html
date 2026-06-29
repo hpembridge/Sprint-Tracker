@@ -542,6 +542,15 @@
       filter: brightness(0.92);
     }
 
+    .sprint-length-badge {
+      margin-left: auto;
+      padding-left: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      opacity: 0.55;
+      white-space: nowrap;
+    }
+
     /* ── Flyout breadcrumbs ── */
     .flyout-breadcrumbs {
       display: flex;
@@ -2484,7 +2493,8 @@
         const initColorIndex = (init?.color_index ?? 0) % INIT_HUES.length;
         const style = epic ? epicChipStyle(epic, initColorIndex) : '';
         const label = sprintLabel(s, numMap);
-        return `<button class="sprint-label-chip" style="${style}" onclick="openSprintFlyout('${s.id}')">${escHtml(label)}</button>`;
+        const lengthBadge = s.length_weeks ? `<span class="sprint-length-badge" title="${s.length_weeks} weeks">${s.length_weeks}</span>` : '';
+        return `<button class="sprint-label-chip" style="${style}" onclick="openSprintFlyout('${s.id}')">${escHtml(label)}${lengthBadge}</button>`;
       }
 
       // Build chip lists per lane
@@ -2678,7 +2688,7 @@
         const chipStyle = epic ? epicChipStyle(epic, initColorIndex) : '';
         const nameCell = `<div style="display:flex;flex-direction:column;gap:4px">
           <div style="display:flex;align-items:center;gap:4px">
-            <button class="sprint-label-chip" style="${chipStyle}" onclick="openSprintFlyout('${sprint.id}')">${escHtml(sprintLabel(sprint, numMap))}</button>
+            <button class="sprint-label-chip" style="${chipStyle}" onclick="openSprintFlyout('${sprint.id}')">${escHtml(sprintLabel(sprint, numMap))}${sprint.length_weeks ? `<span class="sprint-length-badge" title="${sprint.length_weeks} weeks">${sprint.length_weeks}</span>` : ''}</button>
             ${sprint.description ? `<button class="desc-toggle-btn" onclick="toggleSprintDesc('${sprint.id}')" title="Toggle description"><i class="fa-solid fa-chevron-left desc-chevron" id="desc-chevron-${sprint.id}"></i></button>` : ''}
           </div>
           ${sprint.description ? `<div class="sprint-desc-preview" id="desc-${sprint.id}" style="display:none">${renderDesc(sprint.description)}</div>` : ''}
@@ -3092,7 +3102,7 @@
             }
 
             labelRows += `<div class="gantt-label-sprint" style="height:${ROW_H}px">
-              <button class="sprint-label-chip" style="${chipStyle}" onclick="openSprintFlyout('${sprint.id}')">${escHtml(label)}</button>
+              <button class="sprint-label-chip" style="${chipStyle}" onclick="openSprintFlyout('${sprint.id}')">${escHtml(label)}${sprint.length_weeks ? `<span class="sprint-length-badge" title="${sprint.length_weeks} weeks">${sprint.length_weeks}</span>` : ''}</button>
             </div>`;
             barRows += `<div class="gantt-bar-row" style="height:${ROW_H}px;position:relative">${barHtml}</div>`;
           });
@@ -3318,7 +3328,7 @@
             return `
         <div class="flyout-sprint-item ${sprint.released ? 'is-released' : ''}" onclick="openSprintFlyout('${sprint.id}')" style="cursor:pointer">
           <div class="flyout-sprint-header">
-            <span class="sprint-label-chip" style="${chipStyle}">${escHtml(sprintLabel(sprint, numMap))}</span>
+            <span class="sprint-label-chip" style="${chipStyle}">${escHtml(sprintLabel(sprint, numMap))}${sprint.length_weeks ? `<span class="sprint-length-badge" title="${sprint.length_weeks} weeks">${sprint.length_weeks}</span>` : ''}</span>
             <span class="flyout-sprint-badge ${sprint.released ? 'released' : 'planned'}">
               ${sprint.released ? 'Released' : 'Planned'}
             </span>
