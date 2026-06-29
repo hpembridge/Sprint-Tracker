@@ -114,7 +114,7 @@
       background: color-mix(in srgb, var(--white), transparent 92%);
       color: var(--white);
     }
-    
+
 
     /* ── Buttons ── */
     .btn {
@@ -207,29 +207,47 @@
 
     /* ── Initiative rail ── */
     #init-rail {
-      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
       padding: 16px 0px;
       justify-content: center;
     }
+
     .init-rail-btn {
-      display: inline-flex; align-items: center;
-      font-size: 12px; font-weight: 600;
-      padding: 3px 10px; border-radius: 99px;
-      border: 1px solid; cursor: pointer;
-      font-family: inherit; transition: filter 0.1s;
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 99px;
+      border: 1px solid;
+      cursor: pointer;
+      font-family: inherit;
+      transition: filter 0.1s;
       white-space: nowrap;
     }
-    .init-rail-btn:hover { filter: brightness(0.92); }
 
-    #app, #init-rail, #calendar-view, #gantt-view{
+    .init-rail-btn:hover {
+      filter: brightness(0.92);
+    }
+
+    #app,
+    #init-rail,
+    #calendar-view,
+    #gantt-view {
       max-width: 1600px;
       margin: auto;
     }
-    #lane-view{
+
+    #lane-view {
       max-width: 850px;
       margin: auto;
     }
-    #gantt-view, #calendar-view{
+
+    #gantt-view,
+    #calendar-view {
       border: 1px solid var(--border);
       border-radius: 8px;
       overflow: hidden;
@@ -447,23 +465,50 @@
       transition: opacity 0.15s, color 0.15s, background 0.15s;
       cursor: grab;
     }
-    .drag-handle:active { cursor: grabbing; }
-    .drag-handle:hover { color: var(--text); background: var(--border); }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    .drag-handle:hover {
+      color: var(--text);
+      background: var(--border);
+    }
 
     /* ── Drag state ── */
-    tr.dragging { opacity: 0.35; }
-    tr.dragging td { background: transparent !important; }
+    tr.dragging {
+      opacity: 0.35;
+    }
+
+    tr.dragging td {
+      background: transparent !important;
+    }
 
     /* Drop zone lines */
-    tr.drop-above > td { border-top: 2px solid var(--accent) !important; }
-    tr.drop-below > td { border-bottom: 2px solid var(--accent) !important; }
+    tr.drop-above>td {
+      border-top: 2px solid var(--accent) !important;
+    }
+
+    tr.drop-below>td {
+      border-bottom: 2px solid var(--accent) !important;
+    }
 
     /* ── Date cascade animation ── */
     @keyframes date-cascade {
-      0%   { color: var(--accent); transform: translateY(-2px); }
-      60%  { transform: translateY(0); }
-      100% { color: inherit; }
+      0% {
+        color: var(--accent);
+        transform: translateY(-2px);
+      }
+
+      60% {
+        transform: translateY(0);
+      }
+
+      100% {
+        color: inherit;
+      }
     }
+
     tr.sprint-moved .date-calc,
     tr.sprint-moved .step-date {
       animation: date-cascade 0.7s ease-out both;
@@ -606,27 +651,32 @@
       padding: 8px 16px 8px 24px;
       border-radius: 8px;
     }
+
     .desc-toggle-btn:hover {
       color: var(--text);
       background-color: color-mix(in srgb, var(--accent), transparent 95%);
     }
+
     .desc-chevron {
       font-size: 9px;
       transition: transform 0.15s ease;
     }
 
-     p:has(+ ul){
+    p:has(+ ul) {
       font-weight: bold;
-     }
-     p:has(+ ul):first-child{
+    }
+
+    p:has(+ ul):first-child {
       margin-top: 4px;
-     }
-     ul{
+    }
+
+    ul {
       margin: 4px 4px 12px 16px;
-     }
-     li{
+    }
+
+    li {
       padding-top: 2px;
-     }
+    }
 
 
     /* ── Initiative badge ── */
@@ -1080,6 +1130,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      width: 100%;
+      justify-content: space-between;
     }
 
     .cal-nav button {
@@ -1286,7 +1338,8 @@
       overflow: hidden;
       background-color: var(--surface);
     }
-    .cal-grid div:nth-child(5n){
+
+    .cal-grid div:nth-child(5n) {
       border-right: none;
     }
 
@@ -1374,87 +1427,188 @@
 
     /* ── Accent picker ── */
     .accent-picker-wrap {
-      display: flex; align-items: center; gap: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
       color: color-mix(in srgb, var(--white), transparent 40%);
-      font-size: 13px; cursor: pointer;
-      padding: 4px 6px; border-radius: 5px;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 5px;
       transition: background 0.15s;
     }
-    .accent-picker-wrap:hover { background: color-mix(in srgb, var(--white), transparent 88%); }
-    .accent-picker-wrap input[type=color] {
-      width: 18px; height: 18px; border: none; background: none;
-      padding: 0; cursor: pointer; border-radius: 3px; overflow: hidden;
+
+    .accent-picker-wrap:hover {
+      background: color-mix(in srgb, var(--white), transparent 88%);
     }
-    .accent-picker-wrap input[type=color]::-webkit-color-swatch-wrapper { padding: 0; }
-    .accent-picker-wrap input[type=color]::-webkit-color-swatch { border: none; border-radius: 3px; }
+
+    .accent-picker-wrap input[type=color] {
+      width: 18px;
+      height: 18px;
+      border: none;
+      background: none;
+      padding: 0;
+      cursor: pointer;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .accent-picker-wrap input[type=color]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    .accent-picker-wrap input[type=color]::-webkit-color-swatch {
+      border: none;
+      border-radius: 3px;
+    }
 
     /* ── Gantt ── */
-    #gantt-view { background: var(--white); }
+    #gantt-view {
+      background: var(--white);
+    }
+
     .gantt-toolbar {
-      display: flex; align-items: center; padding: 10px 16px;
-      background: var(--white); border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
+
     .gantt-label-init {
-      display: flex; align-items: center; padding: 0 10px;
-      background: var(--surface); border-bottom: 1px solid var(--border);
-      font-size: 12px; font-weight: 600;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 600;
     }
+
     .gantt-label-epic {
-      display: flex; align-items: center; padding: 0 18px;
-      background: var(--white); border-bottom: 1px solid var(--border);
-      font-size: 11px; color: var(--text-muted); font-weight: 500;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
     }
+
     .gantt-label-sprint {
-      display: flex; align-items: center; padding: 0 24px;
-      border-bottom: 1px solid var(--border); background: var(--white);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--white);
     }
-    .gantt-bar-init { background: var(--surface); border-bottom: 1px solid var(--border); }
-    .gantt-bar-epic { background: color-mix(in srgb, var(--surface), transparent 50%); border-bottom: 1px solid var(--border); }
-    .gantt-bar-row { border-bottom: 1px solid var(--border); box-sizing: border-box; }
+
+    .gantt-bar-init {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .gantt-bar-epic {
+      background: color-mix(in srgb, var(--surface), transparent 50%);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .gantt-bar-row {
+      border-bottom: 1px solid var(--border);
+      box-sizing: border-box;
+    }
+
     .gantt-week-tick {
-      position: absolute; top: 6px;
-      font-size: 10px; color: var(--text-muted); font-weight: 500;
-      transform: translateX(-50%); white-space: nowrap; pointer-events: none;
+      position: absolute;
+      top: 6px;
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 500;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      pointer-events: none;
     }
+
     .gantt-week-line {
-      position: absolute; top: 0; bottom: 0; width: 1px;
-      background: var(--border); pointer-events: none;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--border);
+      pointer-events: none;
     }
+
     .gantt-today-line {
-      position: absolute; top: 0; bottom: 0; width: 2px;
-      background: var(--accent); opacity: 0.5; pointer-events: none; z-index: 2;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--accent);
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: 2;
     }
+
     .gantt-bar-inner {
-      position: absolute; top: 6px; bottom: 6px;
-      border-radius: 4px; border: 1px solid transparent;
-      cursor: pointer; overflow: hidden;
-      display: flex; align-items: center;
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
       transition: filter 0.1s;
     }
-    .gantt-bar-inner:hover { filter: brightness(0.9); }
-    .gantt-bar-label {
-      font-size: 10px; font-weight: 600; padding: 0 6px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      position: relative; z-index: 2; color: var(--text);
+
+    .gantt-bar-inner:hover {
+      filter: brightness(0.9);
     }
+
+    .gantt-bar-label {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 0 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      position: relative;
+      z-index: 2;
+      color: var(--text);
+    }
+
     .gantt-marker {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      width: 8px; height: 8px; border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
       background: color-mix(in srgb, var(--text-muted), transparent 30%);
       border: 1.5px solid var(--white);
-      margin-left: -4px; z-index: 3;
+      margin-left: -4px;
+      z-index: 3;
     }
-    .gantt-marker.done { background: #4ade80; }
+
+    .gantt-marker.done {
+      background: #4ade80;
+    }
 
     /* ── Lane View ── */
-    #lane-view { display: none; }
+    #lane-view {
+      display: none;
+    }
+
     .lane-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 48px;
       align-items: start;
     }
+
     .lane {
       background: var(--surface);
       border-radius: 8px;
@@ -1462,6 +1616,7 @@
       overflow: hidden;
 
     }
+
     .lane-header {
       padding: 10px 14px;
       display: flex;
@@ -1470,6 +1625,7 @@
       border-bottom: 1px solid var(--border);
       background: color-mix(in srgb, var(--border), white 60%);
     }
+
     .lane-header-title {
       font-size: 11px;
       font-weight: 700;
@@ -1480,6 +1636,7 @@
       align-items: center;
       gap: 6px;
     }
+
     .lane-count-badge {
       background: var(--accent);
       color: white;
@@ -1490,6 +1647,7 @@
       min-width: 20px;
       text-align: center;
     }
+
     .lane-cards {
       padding: 10px;
       display: flex;
@@ -1503,6 +1661,7 @@
       font-size: 12px;
       color: var(--text-muted);
     }
+
     .lane-card {
       background: var(--white);
       border: 1px solid var(--border);
@@ -1518,22 +1677,26 @@
     .lane-card:hover {
       opacity: 1;
     }
+
     .lane-card-head {
       display: flex;
       flex-direction: column;
       gap: 3px;
     }
+
     .lane-card-desc {
       margin-trim: top;
       font-size: 11px;
       color: var(--text-muted);
       line-height: 1.4;
     }
+
     .lane-card-action {
       display: flex;
       align-items: center;
       gap: 6px;
     }
+
     .lane-card-action .step-btn {
       width: auto;
       flex: 1;
@@ -1541,6 +1704,7 @@
       font-size: 11px;
       font-weight: 600;
     }
+
     .lane-dev-dates {
       display: flex;
       align-items: center;
@@ -1549,6 +1713,7 @@
       color: var(--text-muted);
       padding: 2px 0;
     }
+
     .lane-dev-dates .lane-date-item {
       display: flex;
       align-items: center;
@@ -1596,7 +1761,8 @@
               <th style="width: 50%;">Resources</th>
               <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-review">Review</th>
               <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-handoff">Handoff</th>
-              <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-kickoff">Dev Kickoff</th>
+              <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-kickoff">Dev Kickoff
+              </th>
               <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-test">Test</th>
               <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-release">Release</th>
               <th style="min-width:var(--col-min)"></th>
@@ -2293,15 +2459,15 @@
 
       // Build chip lists per lane
       const designChips = [];
-      const testChips   = [];
-      const devChips    = [];
+      const testChips = [];
+      const devChips = [];
 
       filtered.forEach(s => {
         const done = s.completed_steps || [];
-        if (!done.includes('review'))  designChips.push({ s, step: 'review',  date: s.review });
+        if (!done.includes('review')) designChips.push({ s, step: 'review', date: s.review });
         if (!done.includes('handoff')) designChips.push({ s, step: 'handoff', date: s.handoff });
-        if (!done.includes('test'))    testChips.push(  { s, step: 'test',    date: s.test });
-        if (!s.released)               devChips.push(   { s, step: 'release', date: s.kickoff });
+        if (!done.includes('test')) testChips.push({ s, step: 'test', date: s.test });
+        if (!s.released) devChips.push({ s, step: 'release', date: s.kickoff });
       });
 
       // Sort each lane by date ascending
@@ -2311,10 +2477,10 @@
       devChips.sort(byDate);
 
       const STEP_META = {
-        review:  { icon: 'fa-magnifying-glass', label: 'Review' },
-        handoff: { icon: 'fa-layer-group',       label: 'Handoff' },
-        test:    { icon: 'fa-flask',             label: 'Test' },
-        release: { icon: 'fa-rocket',            label: 'Release' },
+        review: { icon: 'fa-magnifying-glass', label: 'Review' },
+        handoff: { icon: 'fa-layer-group', label: 'Handoff' },
+        test: { icon: 'fa-flask', label: 'Test' },
+        release: { icon: 'fa-rocket', label: 'Release' },
       };
 
       function renderCard({ s, step, date }) {
@@ -2368,9 +2534,9 @@
       }
 
       laneView.innerHTML = `<div class="lane-grid">
-        ${buildLane('Design',      'fa-pen-ruler', designChips)}
-        ${buildLane('Test',        'fa-flask',     testChips)}
-        ${buildLane('Development', 'fa-code',      devChips)}
+        ${buildLane('Design', 'fa-pen-ruler', designChips)}
+        ${buildLane('Test', 'fa-flask', testChips)}
+        ${buildLane('Development', 'fa-code', devChips)}
       </div>`;
     }
 
@@ -2791,7 +2957,7 @@
 
     // ── Gantt ─────────────────────────────────────────────────────────────────────
     function renderGantt() {
-      const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const outer = document.getElementById('gantt-scroll-outer');
       if (!outer) return;
 
@@ -3349,8 +3515,8 @@
     }
 
     // Collapse/expand description in the list view.
-    window.toggleSprintDesc = function(id) {
-      const desc    = document.getElementById('desc-' + id);
+    window.toggleSprintDesc = function (id) {
+      const desc = document.getElementById('desc-' + id);
       const chevron = document.getElementById('desc-chevron-' + id);
       if (!desc) return;
       const opening = desc.style.display === 'none';
@@ -3360,7 +3526,7 @@
 
     // Auto-continue bullet points in the description textarea.
     // If the current line starts with •, pressing Enter starts the next line with • too.
-    window.handleDescKeydown = function(e) {
+    window.handleDescKeydown = function (e) {
       if (e.key !== 'Enter') return;
       const ta = e.target;
       const pos = ta.selectionStart;
@@ -3370,7 +3536,7 @@
       if (/^- /.test(currentLine)) {
         e.preventDefault();
         const before = text.slice(0, pos);
-        const after  = text.slice(ta.selectionEnd);
+        const after = text.slice(ta.selectionEnd);
         ta.value = before + '\n- ' + after;
         const newPos = pos + 3;
         ta.setSelectionRange(newPos, newPos);
@@ -3458,7 +3624,7 @@
     ]
     document.addEventListener("DOMContentLoaded", (event) => {
       const randomIndex = Math.floor(Math.random() * loadMessages.length);
-        document.getElementById("load-msg").textContent = loadMessages[randomIndex]
+      document.getElementById("load-msg").textContent = loadMessages[randomIndex]
     });
 
     // ── Firestore Listeners ───────────────────────────────────────────────────────
