@@ -242,7 +242,7 @@
     }
 
     #lane-view {
-      max-width: 850px;
+      max-width: 1600px;
       margin: auto;
     }
 
@@ -1643,8 +1643,8 @@
 
     .lane-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 48px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
       align-items: start;
     }
 
@@ -1758,6 +1758,218 @@
       align-items: center;
       gap: 4px;
     }
+
+    /* ── User Avatar ── */
+    .user-avatar-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      border: 1px solid color-mix(in srgb, var(--white), transparent 75%);
+      background: color-mix(in srgb, var(--white), transparent 90%);
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--white);
+      transition: background 0.12s;
+      font-family: inherit;
+    }
+    .user-avatar-btn:hover {
+      background: color-mix(in srgb, var(--white), transparent 82%);
+    }
+    .user-avatar-btn .ua-name {
+      font-size: 11px;
+      font-weight: 600;
+      max-width: 80px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ── User Profile Popover ── */
+    #user-profile-popover {
+      position: fixed;
+      top: 58px;
+      right: 20px;
+      z-index: 1000;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      padding: 16px;
+      width: 272px;
+      display: none;
+    }
+    #user-profile-popover.open { display: block; }
+
+    .up-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .up-icon-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+    .up-icon-btn {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-muted);
+      transition: all 0.1s;
+    }
+    .up-icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .up-icon-btn.selected {
+      background: color-mix(in srgb, var(--accent), transparent 85%);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .up-color-grid { display: flex; gap: 6px; flex-wrap: wrap; }
+    .up-color-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2.5px solid transparent;
+      cursor: pointer;
+      transition: transform 0.1s;
+      outline: none;
+    }
+    .up-color-btn:hover { transform: scale(1.15); }
+    .up-color-btn.selected { border-color: var(--text); transform: scale(1.1); }
+
+    /* ── Story Bullets (read-only) ── */
+    .story-bullets { display: flex; flex-direction: column; gap: 6px; }
+    .story-bullet-item { display: flex; flex-direction: column; gap: 2px; }
+    .story-bullet-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .story-bullet-name::before {
+      content: '●';
+      font-size: 7px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .story-criteria-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding-left: 14px;
+      margin-top: 2px;
+    }
+    .criterion-label {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+    }
+
+    /* ── Story Checklist (lane cards) ── */
+    .lane-stories-bullets { font-size: 11px; }
+    .lane-stories-checklist { display: flex; flex-direction: column; gap: 8px; padding: 4px 0; }
+    .story-list-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      padding: 3px 0;
+      border-radius: 4px;
+      margin-bottom: 2px;
+    }
+    .story-list-header:hover { opacity: 0.75; }
+    .story-checklist-item { display: flex; flex-direction: column; gap: 3px; }
+    .story-checklist-name { font-size: 11px; font-weight: 600; color: var(--text); }
+    .story-criteria-checks { display: flex; flex-direction: column; gap: 2px; padding-left: 4px; }
+    .criterion-check-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 2px 0;
+    }
+    .criterion-check-row input[type=checkbox] {
+      cursor: pointer;
+      accent-color: var(--accent);
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
+      margin: 0;
+    }
+    .criterion-check-label { font-size: 11px; color: var(--text); transition: color 0.1s; line-height: 1.2; }
+    .criterion-check-label.is-checked { color: var(--text-muted); text-decoration: line-through; }
+    .criterion-checker {
+      font-size: 9px;
+      color: var(--text-muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0 4px;
+      margin-left: auto;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── Story Form (edit flyout) ── */
+    .story-form-card {
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .story-form-header { display: flex; align-items: center; gap: 6px; }
+    .story-name-input { flex: 1; }
+    .story-criteria-area { display: flex; flex-direction: column; gap: 5px; }
+    .criteria-tags { display: flex; flex-wrap: wrap; gap: 4px; min-height: 4px; }
+    .criterion-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: color-mix(in srgb, var(--accent), transparent 88%);
+      border: 1px solid color-mix(in srgb, var(--accent), transparent 60%);
+      color: var(--text);
+    }
+    .criterion-tag-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      color: var(--text-muted);
+      padding: 0 1px;
+      display: flex;
+      align-items: center;
+    }
+    .criterion-tag-remove:hover { color: var(--danger); }
+    .criteria-input-row { display: flex; gap: 6px; align-items: center; }
+    .criteria-input-row .setting-input { flex: 1; font-size: 11px; padding: 4px 7px; }
   </style>
 </head>
 
@@ -1781,6 +1993,9 @@
         <i class="fa-solid fa-palette"></i>
         <input type="color" id="accent-picker" oninput="setAccent(this.value)">
       </label>
+      <button id="user-avatar-btn" class="user-avatar-btn" onclick="openUserProfile()">
+        <i class="fa-solid fa-user" style="font-size:11px"></i>
+      </button>
       <button class="btn btn-ghost" onclick="openSettings()"><i class="fa-solid fa-gear"></i> Settings</button>
     </div>
   </header>
@@ -1855,6 +2070,25 @@
   </main>
   <datalist id="initiative-list"></datalist>
   <datalist id="epic-list"></datalist>
+
+  <!-- User Profile Popover -->
+  <div id="user-profile-popover">
+    <div id="up-welcome" style="display:none;margin-bottom:12px;padding:8px 10px;background:color-mix(in srgb,var(--accent),transparent 90%);border-radius:6px;font-size:12px;color:var(--accent)">
+      <strong>Welcome!</strong> Set up your profile to track who checks off criteria.
+    </div>
+    <div class="up-section-label">Your Name</div>
+    <input type="text" id="up-name" class="setting-input" placeholder="Enter your name…"
+      style="width:100%;margin-bottom:12px"
+      onkeydown="if(event.key==='Enter')saveUserProfile()">
+    <div class="up-section-label">Icon</div>
+    <div class="up-icon-grid" id="up-icon-grid"></div>
+    <div class="up-section-label" style="margin-top:10px">Color</div>
+    <div class="up-color-grid" id="up-color-grid"></div>
+    <div style="display:flex;gap:6px;margin-top:14px;justify-content:flex-end">
+      <button class="btn btn-sm btn-secondary" onclick="closeUserProfile()">Cancel</button>
+      <button class="btn btn-sm btn-primary" onclick="saveUserProfile()">Save Profile</button>
+    </div>
+  </div>
 
   <!-- Settings Panel -->
   <div id="overlay" class="overlay" onclick="closeSettings()"></div>
@@ -1940,7 +2174,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
     import {
       getFirestore, collection, doc, onSnapshot, setDoc, addDoc,
-      deleteDoc, updateDoc, query, orderBy, writeBatch, getDocs, getDoc
+      deleteDoc, updateDoc, query, orderBy, writeBatch, getDocs, getDoc, deleteField
     } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
     // ── Accent color ──────────────────────────────────────────────────────────────
@@ -1978,7 +2212,11 @@
     let initiatives = [];   // [{ id, name, order, color_index }]
     let epics = [];         // [{ id, initiative_id, name, order }]
     let sprints = [];       // [{ id, epic_id, initiative_id, sprint_number, description, resources, length_weeks, manual_kickoff, global_order }]
-    let loaded = { settings: false, initiatives: false, epics: false, sprints: false };
+    let stories = [];       // [{ id, sprint_id, name, description, order, criteria, dev_checks, test_checks }]
+    let users = {};         // userId -> { name, icon, color }
+    let currentUser = { id: null, name: '', icon: 'fa-user', color: '#4f46e5' };
+    let loaded = { settings: false, initiatives: false, epics: false, sprints: false, stories: false };
+    let appInitialized = false;
 
     // Popover state
     let popoverCtx = null;  // { sprintId, resource }
@@ -2286,13 +2524,339 @@
       await patchSprint(sprintId, { resources });
     };
 
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePopover(); closeSettings(); closeFlyout(); } });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closePopover(); closeSettings(); closeFlyout(); closeUserProfile(); }
+    });
     document.addEventListener('click', e => {
       const pop = document.getElementById('link-popover');
       if (pop.classList.contains('open') && !pop.contains(e.target) && !e.target.closest('[onclick*="openPopover"]')) {
         closePopover();
       }
     });
+
+    // ── User Management ───────────────────────────────────────────────────────────
+    const ICON_PRESETS = [
+      'fa-user','fa-star','fa-heart','fa-bolt','fa-crown',
+      'fa-robot','fa-ghost','fa-fire','fa-snowflake','fa-moon',
+      'fa-sun','fa-leaf','fa-gem','fa-rocket','fa-cat','fa-dragon'
+    ];
+    const USER_COLOR_PRESETS = [
+      '#4f46e5','#3b82f6','#10b981','#f59e0b','#ef4444',
+      '#8b5cf6','#ec4899','#14b8a6','#f97316','#64748b'
+    ];
+
+    function buildProfileUI() {
+      const iconGrid = document.getElementById('up-icon-grid');
+      if (iconGrid && !iconGrid.children.length) {
+        iconGrid.innerHTML = ICON_PRESETS.map(ic =>
+          `<button class="up-icon-btn ${ic === currentUser.icon ? 'selected' : ''}" data-icon="${ic}" onclick="selectUserIcon(this)" title="${ic}">
+            <i class="fa-solid ${ic}"></i>
+          </button>`
+        ).join('');
+      }
+      const colorGrid = document.getElementById('up-color-grid');
+      if (colorGrid && !colorGrid.children.length) {
+        colorGrid.innerHTML = USER_COLOR_PRESETS.map(c =>
+          `<button class="up-color-btn ${c === currentUser.color ? 'selected' : ''}" data-color="${c}"
+            style="background:${c}" onclick="selectUserColor(this)" title="${c}"></button>`
+        ).join('');
+      }
+    }
+
+    function initUser() {
+      let userId = localStorage.getItem('sprint-tracker-user-id');
+      if (!userId) {
+        userId = (crypto.randomUUID ? crypto.randomUUID() : 'u-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+        localStorage.setItem('sprint-tracker-user-id', userId);
+      }
+      currentUser = {
+        id: userId,
+        name: localStorage.getItem('sprint-tracker-user-name') || '',
+        icon: localStorage.getItem('sprint-tracker-user-icon') || 'fa-user',
+        color: localStorage.getItem('sprint-tracker-user-color') || '#4f46e5'
+      };
+      buildProfileUI();
+      renderUserAvatar();
+      if (!currentUser.name) setTimeout(openUserProfile, 600);
+      syncUserToFirestore();
+    }
+
+    function renderUserAvatar() {
+      const btn = document.getElementById('user-avatar-btn');
+      if (!btn) return;
+      const { name, icon, color } = currentUser;
+      const firstName = name ? name.split(' ')[0] : '';
+      btn.innerHTML = `<i class="fa-solid ${icon}" style="font-size:11px;color:${color}"></i>${firstName ? `<span class="ua-name">${escHtml(firstName)}</span>` : ''}`;
+    }
+
+    async function syncUserToFirestore() {
+      if (!currentUser.id || !currentUser.name) return;
+      try {
+        await setDoc(doc(db, 'users', currentUser.id), {
+          name: currentUser.name, icon: currentUser.icon, color: currentUser.color,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+      } catch (e) { /* non-fatal */ }
+    }
+
+    window.openUserProfile = function () {
+      const pop = document.getElementById('user-profile-popover');
+      if (pop.classList.contains('open')) { pop.classList.remove('open'); return; }
+      // Rebuild UI to reflect latest currentUser state
+      document.getElementById('up-icon-grid').innerHTML = ICON_PRESETS.map(ic =>
+        `<button class="up-icon-btn ${ic === currentUser.icon ? 'selected' : ''}" data-icon="${ic}" onclick="selectUserIcon(this)">
+          <i class="fa-solid ${ic}"></i>
+        </button>`
+      ).join('');
+      document.getElementById('up-color-grid').innerHTML = USER_COLOR_PRESETS.map(c =>
+        `<button class="up-color-btn ${c === currentUser.color ? 'selected' : ''}" data-color="${c}"
+          style="background:${c}" onclick="selectUserColor(this)"></button>`
+      ).join('');
+      document.getElementById('up-name').value = currentUser.name;
+      const welcome = document.getElementById('up-welcome');
+      if (welcome) welcome.style.display = currentUser.name ? 'none' : 'block';
+      pop.classList.add('open');
+      setTimeout(() => document.getElementById('up-name').focus(), 50);
+    };
+
+    window.closeUserProfile = function () {
+      document.getElementById('user-profile-popover').classList.remove('open');
+    };
+
+    window.saveUserProfile = async function () {
+      const name = document.getElementById('up-name').value.trim();
+      if (!name) { document.getElementById('up-name').focus(); return; }
+      const icon = document.querySelector('.up-icon-btn.selected')?.dataset.icon || currentUser.icon;
+      const color = document.querySelector('.up-color-btn.selected')?.dataset.color || currentUser.color;
+      currentUser = { ...currentUser, name, icon, color };
+      localStorage.setItem('sprint-tracker-user-name', name);
+      localStorage.setItem('sprint-tracker-user-icon', icon);
+      localStorage.setItem('sprint-tracker-user-color', color);
+      renderUserAvatar();
+      closeUserProfile();
+      await syncUserToFirestore();
+      toast('Profile saved');
+    };
+
+    window.selectUserIcon = function (btn) {
+      document.querySelectorAll('.up-icon-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    };
+    window.selectUserColor = function (btn) {
+      document.querySelectorAll('.up-color-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    };
+
+    // Close profile popover when clicking outside
+    document.addEventListener('click', e => {
+      const pop = document.getElementById('user-profile-popover');
+      if (pop?.classList.contains('open') &&
+          !pop.contains(e.target) &&
+          !document.getElementById('user-avatar-btn')?.contains(e.target)) {
+        pop.classList.remove('open');
+      }
+    });
+
+    // ── Stories ───────────────────────────────────────────────────────────────────
+    const laneListCollapsed = new Map(); // `${sprintId}-${lane}` -> bool
+
+    window.toggleLaneList = function (sprintId, lane) {
+      const key = `${sprintId}-${lane}`;
+      laneListCollapsed.set(key, !laneListCollapsed.get(key));
+      renderLaneView();
+    };
+
+    function sprintStories(sprintId) {
+      return stories.filter(s => s.sprint_id === sprintId).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }
+
+    async function addStory(sprintId) {
+      const existing = sprintStories(sprintId);
+      const order = existing.length ? Math.max(...existing.map(s => s.order ?? 0)) + 1 : 0;
+      await addDoc(collection(db, 'stories'), {
+        sprint_id: sprintId, name: 'New Story', description: '',
+        order, criteria: [], dev_checks: {}, test_checks: {}
+      });
+    }
+
+    async function deleteStory(id) {
+      await deleteDoc(doc(db, 'stories', id));
+    }
+
+    async function patchStory(id, data) {
+      await updateDoc(doc(db, 'stories', id), data);
+    }
+    window.patchStory = patchStory;
+
+    window.toggleCriterionCheck = async function (storyId, criterionId, lane) {
+      const story = stories.find(s => s.id === storyId);
+      if (!story) return;
+      const checksKey = lane === 'dev' ? 'dev_checks' : 'test_checks';
+      const checks = story[checksKey] || {};
+      const patch = {};
+      if (checks[criterionId]) {
+        patch[`${checksKey}.${criterionId}`] = deleteField();
+      } else {
+        patch[`${checksKey}.${criterionId}`] = {
+          userId: currentUser.id || 'anon',
+          userName: currentUser.name || 'Unknown',
+          checkedAt: new Date().toISOString()
+        };
+      }
+      await updateDoc(doc(db, 'stories', storyId), patch);
+    };
+
+    async function addCriterionToStory(storyId, label) {
+      const story = stories.find(s => s.id === storyId);
+      if (!story || !label?.trim()) return;
+      const criteria = [...(story.criteria || [])];
+      const id = 'c-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+      criteria.push({ id, label: label.trim() });
+      await patchStory(storyId, { criteria });
+    }
+
+    async function removeCriterionFromStory(storyId, criterionId) {
+      const story = stories.find(s => s.id === storyId);
+      if (!story) return;
+      const criteria = (story.criteria || []).filter(c => c.id !== criterionId);
+      await patchStory(storyId, { criteria });
+    }
+
+    window.addStoryAndRefresh = async function (sprintId) {
+      await addStory(sprintId);
+      openSprintEditFlyout(sprintId);
+    };
+    window.deleteStoryAndRefresh = async function (storyId, sprintId) {
+      if (!confirm('Delete this story and all its criteria?')) return;
+      await deleteStory(storyId);
+      openSprintEditFlyout(sprintId);
+    };
+    window.addCriterionAndRefresh = async function (storyId, label, sprintId) {
+      if (!label?.trim()) return;
+      await addCriterionToStory(storyId, label.trim());
+      openSprintEditFlyout(sprintId);
+    };
+    window.removeCriterionAndRefresh = async function (storyId, criterionId, sprintId) {
+      await removeCriterionFromStory(storyId, criterionId);
+      openSprintEditFlyout(sprintId);
+    };
+
+    // Renders stories as a bullet list with criteria labels (read-only)
+    function renderStoriesBullets(sprintId) {
+      const ss = sprintStories(sprintId);
+      if (!ss.length) return '';
+      return `<div class="story-bullets">${ss.map(story => {
+        const criteriaHtml = story.criteria?.length
+          ? `<div class="story-criteria-inline">${story.criteria.map(c => `<span class="criterion-label">${escHtml(c.label)}</span>`).join('')}</div>`
+          : '';
+        return `<div class="story-bullet-item">
+          <div class="story-bullet-name">${escHtml(story.name)}</div>
+          ${criteriaHtml}
+        </div>`;
+      }).join('')}</div>`;
+    }
+
+    // Renders stories with checkboxes for lane cards (dev or test)
+    function renderStoriesChecklist(sprintId, lane) {
+      const ss = sprintStories(sprintId);
+      if (!ss.length) return '<div style="font-size:11px;color:var(--text-muted);font-style:italic;padding:2px 0">No stories — add them in the sprint editor</div>';
+      const checksKey = lane === 'dev' ? 'dev_checks' : 'test_checks';
+      const collapsed = laneListCollapsed.get(`${sprintId}-${lane}`) ?? true;
+
+      // Overall progress across all stories in this lane
+      let totalAll = 0, doneAll = 0;
+      ss.forEach(story => {
+        const checks = story[checksKey] || {};
+        totalAll += story.criteria?.length || 0;
+        doneAll += story.criteria?.filter(c => !!checks[c.id]).length || 0;
+      });
+      const allDone = totalAll > 0 && doneAll === totalAll;
+      const overallBadge = totalAll > 0
+        ? `<span style="font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px;margin-left:auto;flex-shrink:0;
+            background:${allDone ? 'color-mix(in srgb,var(--dot-green),transparent 80%)' : 'var(--surface)'};
+            border:1px solid ${allDone ? 'var(--dot-green)' : 'var(--border)'};
+            color:${allDone ? '#166534' : 'var(--text-muted)'}">${doneAll}/${totalAll}</span>`
+        : '';
+
+      const header = `<div class="story-list-header" onclick="toggleLaneList('${sprintId}','${lane}')">
+        <i class="fa-solid fa-chevron-${collapsed ? 'right' : 'down'}" style="font-size:8px;color:var(--text-muted);flex-shrink:0"></i>
+        <span style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em">Stories</span>
+        ${overallBadge}
+      </div>`;
+
+      if (collapsed) return header;
+
+      const storiesHtml = ss.map(story => {
+        const checks = story[checksKey] || {};
+        const total = story.criteria?.length || 0;
+        const done = story.criteria?.filter(c => !!checks[c.id]).length || 0;
+        const storyAllDone = total > 0 && done === total;
+        const storyBadge = total > 0
+          ? `<span style="font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px;flex-shrink:0;
+              background:${storyAllDone ? 'color-mix(in srgb,var(--dot-green),transparent 80%)' : 'var(--surface)'};
+              border:1px solid ${storyAllDone ? 'var(--dot-green)' : 'var(--border)'};
+              color:${storyAllDone ? '#166534' : 'var(--text-muted)'}">${done}/${total}</span>`
+          : '';
+
+        const criteriaHtml = story.criteria?.length
+          ? story.criteria.map(c => {
+              const checked = !!checks[c.id];
+              const checker = checks[c.id];
+              return `<label class="criterion-check-row">
+                <input type="checkbox" ${checked ? 'checked' : ''}
+                  onchange="toggleCriterionCheck('${story.id}','${c.id}','${lane}')">
+                <span class="criterion-check-label ${checked ? 'is-checked' : ''}">${escHtml(c.label)}</span>
+                ${checked && checker?.userName ? `<span class="criterion-checker">${escHtml(checker.userName)}</span>` : ''}
+              </label>`;
+            }).join('')
+          : '<div style="font-size:11px;color:var(--text-muted);padding-left:4px">No criteria yet</div>';
+
+        return `<div class="story-checklist-item">
+          <div class="story-checklist-name" style="display:flex;align-items:center;gap:5px">
+            <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">● ${escHtml(story.name)}</span>
+            ${storyBadge}
+          </div>
+          <div class="story-criteria-checks">${criteriaHtml}</div>
+        </div>`;
+      }).join('');
+
+      return header + storiesHtml;
+    }
+
+    // Renders inline story form cards for the edit flyout
+    function renderStoryForms(sprintId) {
+      const ss = sprintStories(sprintId);
+      if (!ss.length) return '<div style="font-size:12px;color:var(--text-muted);padding:4px 0">No stories yet. Click "+ Add Story" to create one.</div>';
+      return ss.map(story => {
+        const criteriaHtml = (story.criteria || []).map(c =>
+          `<span class="criterion-tag">${escHtml(c.label)}<button class="criterion-tag-remove"
+            onclick="removeCriterionAndRefresh('${story.id}','${c.id}','${sprintId}')">×</button></span>`
+        ).join('');
+        return `<div class="story-form-card">
+          <div class="story-form-header">
+            <input type="text" class="setting-input story-name-input" value="${escHtml(story.name)}"
+              placeholder="Story name"
+              onblur="patchStory('${story.id}',{name:this.value.trim()||'Untitled'})">
+            <button class="btn-icon danger" title="Delete story"
+              onclick="deleteStoryAndRefresh('${story.id}','${sprintId}')">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+          <div class="story-criteria-area">
+            <div class="criteria-tags" id="ct-${story.id}">${criteriaHtml || '<span style="font-size:11px;color:var(--text-muted)">No criteria yet</span>'}</div>
+            <div class="criteria-input-row">
+              <input type="text" class="setting-input" id="ci-${story.id}"
+                placeholder="Add criterion (e.g. read, update)…"
+                onkeydown="if(event.key==='Enter'||event.key===','){event.preventDefault();addCriterionAndRefresh('${story.id}',this.value,'${sprintId}');this.value=''}">
+              <button class="btn btn-sm btn-secondary"
+                onclick="addCriterionAndRefresh('${story.id}',document.getElementById('ci-${story.id}').value,'${sprintId}');document.getElementById('ci-${story.id}').value=''">
+                Add
+              </button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
 
     // ── Settings Panel ────────────────────────────────────────────────────────────
     function openSettings() {
@@ -2377,7 +2941,8 @@
     }
 
     // ── Render ────────────────────────────────────────────────────────────────────
-    let currentView = 'table';
+    const VIEW_KEY = 'sprint-tracker-view';
+    let currentView = localStorage.getItem(VIEW_KEY) || 'table';
 
     // ── Drag-and-drop reorder ─────────────────────────────────────────────────────
     // Map<sprintId, cascadeDelayMs> — populated on drop, consumed and cleared in render()
@@ -2469,7 +3034,6 @@
       const computed = computeAllSprints();
       const numMap = computeSprintNumbers();
 
-      // Apply global filters
       const filtered = computed.filter(s => {
         if (gInitFilter && !gInitFilter.has(s.initiative_id)) return false;
         if (gEpicFilter && !gEpicFilter.has(s.epic_id)) return false;
@@ -2477,7 +3041,6 @@
         return true;
       });
 
-      // Helper: left-border color derived from epic/initiative hue
       function borderColor(s) {
         const init = initiatives.find(i => i.id === s.initiative_id);
         const epic = epics.find(e => e.id === s.epic_id);
@@ -2486,70 +3049,54 @@
         return `hsl(${hue} 60% 50%)`;
       }
 
-      // Helper: sprint label chip HTML
       function chipHtml(s) {
         const init = initiatives.find(i => i.id === s.initiative_id);
         const epic = epics.find(e => e.id === s.epic_id);
         const initColorIndex = (init?.color_index ?? 0) % INIT_HUES.length;
         const style = epic ? epicChipStyle(epic, initColorIndex) : '';
         const label = sprintLabel(s, numMap);
-        const lengthBadge = s.length_weeks ? `<span class="sprint-length-badge" title="${s.length_weeks} weeks">${s.length_weeks}</span>` : '';
+        const lengthBadge = s.length_weeks ? `<span class="sprint-length-badge">${s.length_weeks}</span>` : '';
         return `<button class="sprint-label-chip" style="${style}" onclick="openSprintFlyout('${s.id}')">${escHtml(label)}${lengthBadge}</button>`;
       }
 
-      // Build chip lists per lane
-      const designChips = [];
-      const testChips = [];
-      const devChips = [];
+      function sprintSummaryHtml(s) {
+        const ss = sprintStories(s.id);
+        if (ss.length) return `<div class="lane-stories-bullets">${renderStoriesBullets(s.id)}</div>`;
+        if (s.description) return `<div class="lane-card-desc">${renderDesc(s.description)}</div>`;
+        return '';
+      }
+
+      // Categorize into 4 lanes
+      const designItems = [];
+      const devItems = [];
+      const testItems = [];
+      const releaseItems = [];
 
       filtered.forEach(s => {
         const done = s.completed_steps || [];
-        if (!done.includes('review')) designChips.push({ s, step: 'review', date: s.review });
-        if (!done.includes('handoff')) designChips.push({ s, step: 'handoff', date: s.handoff });
-        if (!done.includes('test')) testChips.push({ s, step: 'test', date: s.test });
-        if (!s.released) devChips.push({ s, step: 'release', date: s.kickoff });
+        if (!done.includes('review')) designItems.push({ s, step: 'review', date: s.review });
+        if (!done.includes('handoff')) designItems.push({ s, step: 'handoff', date: s.handoff });
+        // Development: handoff done, test not done, not released
+        if (done.includes('handoff') && !done.includes('test') && !s.released)
+          devItems.push({ s, date: s.kickoff });
+        // Test: handoff done, test not done, not released (overlaps with dev intentionally)
+        if (done.includes('handoff') && !done.includes('test') && !s.released)
+          testItems.push({ s, date: s.test });
+        // Release: test done, not released
+        if (done.includes('test') && !s.released)
+          releaseItems.push({ s, date: s.release });
       });
 
-      // Sort each lane by date ascending
       const byDate = (a, b) => (a.date || '').localeCompare(b.date || '');
-      designChips.sort(byDate);
-      testChips.sort(byDate);
-      devChips.sort(byDate);
+      [designItems, devItems, testItems, releaseItems].forEach(arr => arr.sort(byDate));
 
-      const STEP_META = {
-        review: { icon: 'fa-magnifying-glass', label: 'Review' },
-        handoff: { icon: 'fa-layer-group', label: 'Handoff' },
-        test: { icon: 'fa-flask', label: 'Test' },
-        release: { icon: 'fa-rocket', label: 'Release' },
-      };
-
-      function renderCard({ s, step, date }) {
-        const meta = STEP_META[step];
-        const isDone = step === 'release' ? s.released : (s.completed_steps || []).includes(step);
-        const headHtml = `<div class="lane-card-head">
-            ${chipHtml(s)}
-            ${s.description ? `<div class="lane-card-desc">${renderDesc(s.description)}</div>` : ''}
-          </div>`;
-
-        if (step === 'release') {
-          return `<div class="lane-card" style="border-left-color:${borderColor(s)}">
-            ${headHtml}
-            <div class="lane-dev-dates">
-              <span class="lane-date-item"><i class="fa-solid fa-code" style="font-size:9px"></i> ${fmtDate(s.kickoff)}</span>
-              <i class="fa-solid fa-arrow-right" style="font-size:9px;opacity:0.35"></i>
-              <span class="lane-date-item"><i class="fa-solid fa-rocket" style="font-size:9px"></i> ${fmtDate(s.release)}</span>
-            </div>
-            <div class="lane-card-action">
-              <button class="step-btn ${isDone ? 'release-done' : ''}" onclick="toggleStep('${s.id}','release')">
-                <i class="fa-solid ${meta.icon}" style="font-size:10px"></i>
-                ${meta.label} &nbsp;·&nbsp; <span class="step-date">${fmtDate(s.release)}</span>
-              </button>
-            </div>
-          </div>`;
-        }
-
+      function renderDesignCard({ s, step, date }) {
+        const isDone = (s.completed_steps || []).includes(step);
+        const meta = step === 'review'
+          ? { icon: 'fa-magnifying-glass', label: 'Review' }
+          : { icon: 'fa-layer-group', label: 'Handoff' };
         return `<div class="lane-card" style="border-left-color:${borderColor(s)}">
-          ${headHtml}
+          <div class="lane-card-head">${chipHtml(s)}${sprintSummaryHtml(s)}</div>
           <div class="lane-card-action">
             <button class="step-btn ${isDone ? 'done' : ''}" onclick="toggleStep('${s.id}','${step}')">
               <i class="fa-solid ${meta.icon}" style="font-size:10px"></i>
@@ -2559,11 +3106,54 @@
         </div>`;
       }
 
-      function buildLane(title, icon, chips) {
-        const cards = chips.length
-          ? chips.slice(0, 1).map(renderCard).join('')
+      function renderDevCard({ s, date }) {
+        return `<div class="lane-card" style="border-left-color:${borderColor(s)}">
+          <div class="lane-card-head">${chipHtml(s)}</div>
+          <div class="lane-stories-checklist">${renderStoriesChecklist(s.id, 'dev')}</div>
+          <div class="lane-dev-dates">
+            <span class="lane-date-item"><i class="fa-solid fa-code" style="font-size:9px"></i> ${fmtDate(s.kickoff)}</span>
+            <i class="fa-solid fa-arrow-right" style="font-size:9px;opacity:0.35"></i>
+            <span class="lane-date-item"><i class="fa-solid fa-flask" style="font-size:9px"></i> ${fmtDate(s.test)}</span>
+          </div>
+        </div>`;
+      }
+
+      function renderTestCard({ s, date }) {
+        const isDone = (s.completed_steps || []).includes('test');
+        return `<div class="lane-card" style="border-left-color:${borderColor(s)}">
+          <div class="lane-card-head">${chipHtml(s)}</div>
+          <div class="lane-stories-checklist">${renderStoriesChecklist(s.id, 'test')}</div>
+          <div class="lane-card-action">
+            <button class="step-btn ${isDone ? 'done' : ''}" onclick="toggleStep('${s.id}','test')">
+              <i class="fa-solid fa-flask" style="font-size:10px"></i>
+              Test &nbsp;·&nbsp; <span class="step-date">${fmtDate(date)}</span>
+            </button>
+          </div>
+        </div>`;
+      }
+
+      function renderReleaseCard({ s, date }) {
+        return `<div class="lane-card" style="border-left-color:${borderColor(s)}">
+          <div class="lane-card-head">${chipHtml(s)}${sprintSummaryHtml(s)}</div>
+          <div class="lane-dev-dates">
+            <span class="lane-date-item"><i class="fa-solid fa-code" style="font-size:9px"></i> ${fmtDate(s.kickoff)}</span>
+            <i class="fa-solid fa-arrow-right" style="font-size:9px;opacity:0.35"></i>
+            <span class="lane-date-item"><i class="fa-solid fa-rocket" style="font-size:9px"></i> ${fmtDate(s.release)}</span>
+          </div>
+          <div class="lane-card-action">
+            <button class="step-btn ${s.released ? 'release-done' : ''}" onclick="toggleStep('${s.id}','release')">
+              <i class="fa-solid fa-rocket" style="font-size:10px"></i>
+              Release &nbsp;·&nbsp; <span class="step-date">${fmtDate(date)}</span>
+            </button>
+          </div>
+        </div>`;
+      }
+
+      function buildLane(title, icon, items, renderFn) {
+        const cards = items.length
+          ? items.slice(0, 1).map(renderFn).join('')
           : `<div class="lane-empty"><i class="fa-solid fa-circle-check" style="color:var(--dot-green);margin-right:5px"></i>All clear</div>`;
-        const badge = chips.length ? `<span class="lane-count-badge">${chips.length}</span>` : '';
+        const badge = items.length ? `<span class="lane-count-badge">${items.length}</span>` : '';
         return `<div class="lane">
           <div class="lane-header">
             <div class="lane-header-title"><i class="fa-solid ${icon}"></i> ${title}</div>
@@ -2574,9 +3164,10 @@
       }
 
       laneView.innerHTML = `<div class="lane-grid">
-        ${buildLane('Design', 'fa-pen-ruler', designChips)}
-        ${buildLane('Test', 'fa-flask', testChips)}
-        ${buildLane('Development', 'fa-code', devChips)}
+        ${buildLane('Design', 'fa-pen-ruler', designItems, renderDesignCard)}
+        ${buildLane('Development', 'fa-code', devItems, renderDevCard)}
+        ${buildLane('Test', 'fa-flask', testItems, renderTestCard)}
+        ${buildLane('Release', 'fa-rocket', releaseItems, renderReleaseCard)}
       </div>`;
     }
 
@@ -2686,12 +3277,17 @@
         // Sprint name chip — colored by epic, clickable to read-only view
         const initColorIndex = init ? init.color_index % INIT_HUES.length : 0;
         const chipStyle = epic ? epicChipStyle(epic, initColorIndex) : '';
+        const ss = sprintStories(sprint.id);
+        const hasPreview = ss.length > 0 || !!sprint.description;
+        const previewHtml = ss.length
+          ? renderStoriesBullets(sprint.id)
+          : (sprint.description ? renderDesc(sprint.description) : '');
         const nameCell = `<div style="display:flex;flex-direction:column;gap:4px">
           <div style="display:flex;align-items:center;gap:4px">
             <button class="sprint-label-chip" style="${chipStyle}" onclick="openSprintFlyout('${sprint.id}')">${escHtml(sprintLabel(sprint, numMap))}${sprint.length_weeks ? `<span class="sprint-length-badge" title="${sprint.length_weeks} weeks">${sprint.length_weeks}</span>` : ''}</button>
-            ${sprint.description ? `<button class="desc-toggle-btn" onclick="toggleSprintDesc('${sprint.id}')" title="Toggle description"><i class="fa-solid fa-chevron-left desc-chevron" id="desc-chevron-${sprint.id}"></i></button>` : ''}
+            ${hasPreview ? `<button class="desc-toggle-btn" onclick="toggleSprintDesc('${sprint.id}')" title="Toggle details"><i class="fa-solid fa-chevron-left desc-chevron" id="desc-chevron-${sprint.id}"></i></button>` : ''}
           </div>
-          ${sprint.description ? `<div class="sprint-desc-preview" id="desc-${sprint.id}" style="display:none">${renderDesc(sprint.description)}</div>` : ''}
+          ${hasPreview ? `<div class="sprint-desc-preview" id="desc-${sprint.id}" style="display:none">${previewHtml}</div>` : ''}
         </div>`;
 
         // Kickoff cell (read-only in table, editable in flyout)
@@ -2745,6 +3341,7 @@
     // ── View Toggle ───────────────────────────────────────────────────────────────
     window.setView = function (v) {
       currentView = v;
+      localStorage.setItem(VIEW_KEY, v);
       document.getElementById('app').style.display = v === 'table' ? 'block' : 'none';
       document.getElementById('calendar-view').style.display = v === 'calendar' ? 'flex' : 'none';
       document.getElementById('gantt-view').style.display = v === 'gantt' ? 'flex' : 'none';
@@ -3370,6 +3967,17 @@
       document.getElementById('flyout-title').innerHTML =
         `<span class="sprint-label-chip" style="${chipStyle}">${escHtml(label)}</span>`;
 
+      const sprintStoriesHtml = (() => {
+        const ss = sprintStories(sprint.id);
+        if (ss.length) {
+          return `<div class="setting-row" style="align-items:flex-start"><label>Stories</label>${renderStoriesBullets(sprint.id)}</div>`;
+        }
+        if (sprint.description) {
+          return `<div class="setting-row" style="align-items:flex-start"><label>Description</label><div class="flyout-detail-val">${renderDesc(sprint.description)}</div></div>`;
+        }
+        return '';
+      })();
+
       document.getElementById('flyout-body').innerHTML = `
         <div class="flyout-breadcrumbs">
           ${init ? `<button class="flyout-bc-link" onclick="openInitiativeFlyout('${init.id}')">${escHtml(init.name)}</button><span class="flyout-bc-sep">›</span>` : ''}
@@ -3380,7 +3988,7 @@
         <div class="setting-group">
           <h3>Details</h3>
           <div class="setting-row"><label>Length</label><span class="flyout-detail-val">${sprint.length_weeks || 2} weeks</span></div>
-          ${sprint.description ? `<div class="setting-row" style="align-items:flex-start"><label>Description</label><div class="flyout-detail-val">${renderDesc(sprint.description)}</div></div>` : ''}
+          ${sprintStoriesHtml}
         </div>
 
         <div class="setting-group">
@@ -3467,6 +4075,14 @@
               ${sprint.manual_kickoff && !isFirstSprint ? `<button class="btn-icon" title="Reset to auto" onclick="clearKickoff('${id}');openSprintEditFlyout('${id}')"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
             </div>
           </div>
+        </div>
+
+        <div class="setting-group">
+          <h3>Stories</h3>
+          <div id="flyout-stories-${id}">${renderStoryForms(id)}</div>
+          <button class="resource-add-btn" style="margin-top:8px" onclick="addStoryAndRefresh('${id}')">
+            <i class="fa-solid fa-plus"></i> Add Story
+          </button>
         </div>
 
         <div class="setting-group">
@@ -3673,12 +4289,15 @@
     // ── Firestore Listeners ───────────────────────────────────────────────────────
     function checkAllLoaded() {
       if (Object.values(loaded).every(v => v)) {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        document.getElementById('init-rail').style.display = 'flex';
-        document.getElementById('conn-dot').className = 'dot green';
-        document.getElementById('conn-dot').title = 'Connected';
-        updateHeaders();
+        if (!appInitialized) {
+          appInitialized = true;
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('init-rail').style.display = 'flex';
+          document.getElementById('conn-dot').className = 'dot green';
+          document.getElementById('conn-dot').title = 'Connected';
+          updateHeaders();
+          setView(currentView); // restores correct view on initial load
+        }
         render();
       }
     }
@@ -3724,6 +4343,13 @@
       }
     });
 
+    onSnapshot(collection(db, 'stories'), snap => {
+      stories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      loaded.stories = true;
+      checkAllLoaded();
+      if (Object.values(loaded).every(v => v)) render();
+    });
+
     async function pruneOrphans() {
       const batch = writeBatch(db);
       let changes = 0;
@@ -3747,10 +4373,11 @@
       try {
         await seedIfEmpty();
       } catch (e) {
-        // May fail if data already exists, that's fine
         console.log('Seed check:', e.message);
       }
     })();
+
+    initUser();
   </script>
 </body>
 
