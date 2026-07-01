@@ -2045,7 +2045,7 @@
               <th style="width: 50%;">Resources</th>
               <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-review">Review</th>
               <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-handoff">Handoff</th>
-              <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-kickoff">Dev Kickoff
+              <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-kickoff">Development
               </th>
               <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-test">Test</th>
               <th style="min-width:var(--col-min); text-align:center;white-space:nowrap" id="hdr-release">Release</th>
@@ -2075,7 +2075,7 @@
           <button class="filter-pill handoff" id="fp-handoff" onclick="toggleFilter('handoff')"><i
               class="fa-solid fa-layer-group chip-icon"></i> Handoff</button>
           <button class="filter-pill kickoff" id="fp-kickoff" onclick="toggleFilter('kickoff')"><i
-              class="fa-solid fa-code chip-icon"></i> Dev Kickoff</button>
+              class="fa-solid fa-code chip-icon"></i> Development</button>
           <button class="filter-pill test" id="fp-test" onclick="toggleFilter('test')"><i
               class="fa-solid fa-flask chip-icon"></i> Test</button>
           <button class="filter-pill release" id="fp-release" onclick="toggleFilter('release')"><i
@@ -2955,7 +2955,7 @@
       };
       set('hdr-review', 'Review', reviewDow);
       set('hdr-handoff', 'Handoff', handoffDow);
-      set('hdr-kickoff', 'Dev Kickoff', kickoffDow);
+      set('hdr-kickoff', 'Development', kickoffDow);
       set('hdr-test', 'Test', testDow);
       set('hdr-release', 'Release', relDow);
     }
@@ -3324,16 +3324,11 @@
         const initColorIndex = init ? init.color_index % INIT_HUES.length : 0;
         const chipStyle = epic ? epicChipStyle(epic, initColorIndex) : '';
         const ss = sprintStories(sprint.id);
-        const hasPreview = ss.length > 0 || !!sprint.description;
-        const previewHtml = ss.length
-          ? renderStoriesBullets(sprint.id)
-          : (sprint.description ? renderDesc(sprint.description) : '');
         const nameCell = `<div style="display:flex;flex-direction:column;gap:4px">
           <div style="display:flex;align-items:center;gap:4px">
             <button class="sprint-label-chip" style="${chipStyle}" onclick="openSprintFlyout('${sprint.id}')">${escHtml(sprintLabel(sprint, numMap))}${sprint.length_weeks ? `<span class="sprint-length-badge" title="${sprint.length_weeks} weeks">${sprint.length_weeks}</span>` : ''}</button>
-            ${hasPreview ? `<button class="desc-toggle-btn" onclick="toggleSprintDesc('${sprint.id}')" title="Toggle details"><i class="fa-solid fa-chevron-left desc-chevron" id="desc-chevron-${sprint.id}"></i></button>` : ''}
           </div>
-          ${hasPreview ? `<div class="sprint-desc-preview" id="desc-${sprint.id}" style="display:none">${previewHtml}</div>` : ''}
+          ${sprint.description ? `<div class="sprint-desc-preview">${renderDesc(sprint.description)}</div>` : ''}
         </div>`;
 
         // Kickoff cell (read-only in table, editable in flyout)
@@ -3361,7 +3356,7 @@
       </td>
       <td style="text-align:center">
         <button class="step-btn ${(sprint.completed_steps || []).includes('dev_ready') ? 'done' : ''}" onclick="toggleStep('${sprint.id}','dev_ready')" title="Mark dev ready for test">
-          <span class="step-date">${fmtDate(sprint.kickoff)}</span>
+          <span class="step-date">${fmtDate(sprint.test)}</span>
         </button>
       </td>
       <td style="text-align:center">
@@ -3410,7 +3405,7 @@
     const CAL_STEPS = [
       { key: 'review', label: 'Review', icon: 'fa-magnifying-glass', cls: 'review' },
       { key: 'handoff', label: 'Handoff', icon: 'fa-layer-group', cls: 'handoff' },
-      { key: 'kickoff', label: 'Dev Kickoff', icon: 'fa-code', cls: 'kickoff' },
+      { key: 'kickoff', label: 'Development', icon: 'fa-code', cls: 'kickoff' },
       { key: 'test', label: 'Test', icon: 'fa-flask', cls: 'test' },
       { key: 'release', label: 'Release', icon: 'fa-rocket', cls: 'release' },
     ];
