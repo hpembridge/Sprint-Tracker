@@ -321,8 +321,12 @@
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
-      gap: 3px;
-      padding: 6px 0;
+      gap: 8px;
+      padding: 8px 0;
+    }
+
+    .lane-card .resources-cell{
+      margin: 12px 0px;
     }
 
     .resource-chip {
@@ -1849,6 +1853,32 @@
     .up-color-btn:hover { transform: scale(1.15); }
     .up-color-btn.selected { border-color: var(--text); transform: scale(1.1); }
 
+    /* ── Lane card resource links ── */
+    .lane-resources {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding-bottom: 2px;
+    }
+    .lane-resource-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      padding: 2px 7px;
+      border: 1px solid color-mix(in srgb, var(--accent), transparent 70%);
+      border-radius: 4px;
+      background: color-mix(in srgb, var(--accent), transparent 93%);
+      white-space: nowrap;
+      transition: background 0.1s;
+    }
+    .lane-resource-link:hover {
+      background: color-mix(in srgb, var(--accent), transparent 85%);
+    }
+
     /* ── Story Bullets (read-only) ── */
     .story-bullets { display: flex; flex-direction: column; gap: 6px; }
     .story-bullet-item { display: flex; flex-direction: column; gap: 2px; }
@@ -3059,6 +3089,15 @@
         return `<button class="sprint-label-chip" style="${style}" onclick="openSprintFlyout('${s.id}')">${escHtml(label)}${lengthBadge}</button>`;
       }
 
+      function resourceChipsHtml(s) {
+        const resArray = getResourcesArray(s.resources);
+        if (!resArray.length) return '';
+        const chips = resArray.map(r => `<div class="resource-chip">
+          <a href="${escHtml(r.url)}" target="_blank" class="resource-chip-name" title="${escHtml(r.url)}">${escHtml(r.name)}</a>
+        </div>`).join('');
+        return `<div class="resources-cell" style="padding:0">${chips}</div>`;
+      }
+
       function sprintSummaryHtml(s) {
         const ss = sprintStories(s.id);
         if (ss.length) return `<div class="lane-stories-bullets">${renderStoriesBullets(s.id)}</div>`;
@@ -3079,8 +3118,8 @@
         // Development: handoff done, test not done, not released
         if (done.includes('handoff') && !done.includes('test') && !s.released)
           devItems.push({ s, date: s.kickoff });
-        // Test: handoff done, test not done, not released (overlaps with dev intentionally)
-        if (done.includes('handoff') && !done.includes('test') && !s.released)
+        // Test: handoff done, dev_ready signalled, test not done, not released
+        if (done.includes('handoff') && done.includes('dev_ready') && !done.includes('test') && !s.released)
           testItems.push({ s, date: s.test });
         // Release: test done, not released
         if (done.includes('test') && !s.released)
@@ -3096,7 +3135,7 @@
           ? { icon: 'fa-magnifying-glass', label: 'Review' }
           : { icon: 'fa-layer-group', label: 'Handoff' };
         return `<div class="lane-card" style="border-left-color:${borderColor(s)}">
-          <div class="lane-card-head">${chipHtml(s)}${sprintSummaryHtml(s)}</div>
+          <div class="lane-card-head">${chipHtml(s)}${resourceChipsHtml(s)}${sprintSummaryHtml(s)}</div>
           <div class="lane-card-action">
             <button class="step-btn ${isDone ? 'done' : ''}" onclick="toggleStep('${s.id}','${step}')">
               <i class="fa-solid ${meta.icon}" style="font-size:10px"></i>
@@ -3107,13 +3146,20 @@
       }
 
       function renderDevCard({ s, date }) {
+        const isDevReady = (s.completed_steps || []).includes('dev_ready');
         return `<div class="lane-card" style="border-left-color:${borderColor(s)}">
-          <div class="lane-card-head">${chipHtml(s)}</div>
+          <div class="lane-card-head">${chipHtml(s)}${resourceChipsHtml(s)}</div>
           <div class="lane-stories-checklist">${renderStoriesChecklist(s.id, 'dev')}</div>
           <div class="lane-dev-dates">
             <span class="lane-date-item"><i class="fa-solid fa-code" style="font-size:9px"></i> ${fmtDate(s.kickoff)}</span>
             <i class="fa-solid fa-arrow-right" style="font-size:9px;opacity:0.35"></i>
             <span class="lane-date-item"><i class="fa-solid fa-flask" style="font-size:9px"></i> ${fmtDate(s.test)}</span>
+          </div>
+          <div class="lane-card-action">
+            <button class="step-btn ${isDevReady ? 'done' : ''}" onclick="toggleStep('${s.id}','dev_ready')">
+              <i class="fa-solid fa-circle-check" style="font-size:10px"></i>
+              Ready for Test
+            </button>
           </div>
         </div>`;
       }
@@ -3121,7 +3167,7 @@
       function renderTestCard({ s, date }) {
         const isDone = (s.completed_steps || []).includes('test');
         return `<div class="lane-card" style="border-left-color:${borderColor(s)}">
-          <div class="lane-card-head">${chipHtml(s)}</div>
+          <div class="lane-card-head">${chipHtml(s)}${resourceChipsHtml(s)}</div>
           <div class="lane-stories-checklist">${renderStoriesChecklist(s.id, 'test')}</div>
           <div class="lane-card-action">
             <button class="step-btn ${isDone ? 'done' : ''}" onclick="toggleStep('${s.id}','test')">
@@ -3134,7 +3180,7 @@
 
       function renderReleaseCard({ s, date }) {
         return `<div class="lane-card" style="border-left-color:${borderColor(s)}">
-          <div class="lane-card-head">${chipHtml(s)}${sprintSummaryHtml(s)}</div>
+          <div class="lane-card-head">${chipHtml(s)}${resourceChipsHtml(s)}${sprintSummaryHtml(s)}</div>
           <div class="lane-dev-dates">
             <span class="lane-date-item"><i class="fa-solid fa-code" style="font-size:9px"></i> ${fmtDate(s.kickoff)}</span>
             <i class="fa-solid fa-arrow-right" style="font-size:9px;opacity:0.35"></i>
@@ -3313,7 +3359,11 @@
           <span class="step-date">${fmtDate(sprint.handoff)}</span>
         </button>
       </td>
-      <td style="text-align:center">${kickoffCell}</td>
+      <td style="text-align:center">
+        <button class="step-btn ${(sprint.completed_steps || []).includes('dev_ready') ? 'done' : ''}" onclick="toggleStep('${sprint.id}','dev_ready')" title="Mark dev ready for test">
+          <span class="step-date">${fmtDate(sprint.kickoff)}</span>
+        </button>
+      </td>
       <td style="text-align:center">
         <button class="step-btn ${(sprint.completed_steps || []).includes('test') ? 'done' : ''}" onclick="toggleStep('${sprint.id}','test')">
           <span class="step-date">${fmtDate(sprint.test)}</span>
