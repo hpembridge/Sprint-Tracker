@@ -2237,6 +2237,13 @@
     });
     const db = getFirestore(app);
 
+    // ── Owner access ──────────────────────────────────────────────────────────────
+    const OWNER_IDS = [
+      '3a0648db-867e-4656-85ed-736ba22ce292', // Healey (Live Server)
+      '131e9b65-c374-48bf-aebb-3ef171087d69'  // Healey (GitHub Pages)
+    ];
+    function isOwner() { return OWNER_IDS.includes(currentUser.id); }
+
     // ── State ─────────────────────────────────────────────────────────────────────
     let settings = { kickoff_dow: 3, review_offset: 15, handoff_offset: 1, release_offset: 1, lead_time: 0 };
     let initiatives = [];   // [{ id, name, order, color_index }]
@@ -3372,8 +3379,10 @@
       </td>
       <td>
         <div style="display:flex;gap:4px;align-items:center;justify-content:flex-end">
+          ${isOwner() ? `
           <button class="btn-icon" onclick="openSprintEditFlyout('${sprint.id}')" title="Edit sprint"><i class="fa-solid fa-pen-to-square"></i></button>
           <button class="btn-icon danger" onclick="deleteSprint('${sprint.id}')" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+          ` : ''}
         </div>
       </td>
     </tr>`;
@@ -4055,11 +4064,12 @@
             </div>`).join('')}
         </div>` : ''}
 
+        ${isOwner() ? `
         <div style="margin-top:8px">
           <button class="btn btn-primary" onclick="openSprintEditFlyout('${id}')">
             <i class="fa-solid fa-pen-to-square"></i> Edit Sprint
           </button>
-        </div>`;
+        </div>` : ''}`;
 
       openFlyout();
     };
